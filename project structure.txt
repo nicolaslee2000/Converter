@@ -3,7 +3,7 @@ main!
 - select source encoding, target encoding, file or folder
 -> convert encoding of all files within folder to target encoding
 - specify file by: 
-	- file extension(by default only txt files, can change to accept all, or specific)
+	- file extension(by default only txt files, can change to accept all, or specific), or multiple extensions
 	- checkbox hidden files
 	- regex script(display example)
 - working with io for now, might replace with nio later with research
