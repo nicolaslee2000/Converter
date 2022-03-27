@@ -15,13 +15,16 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.file.Path;
 import java.util.Map;
 
+/**
+ * @author Nicolaslee
+ * working with IO package for now. Will try with NIO later.
+ *
+ */
 public class Converter {
 	
 	private File file;
-	private Path path;
 	private Map<String, Charset> availableCharsets;
 	private Charset charset;
 	String charsetsToBeTested[];
@@ -90,5 +93,5 @@ public class Converter {
 		}
 		return charset;
 	}
-
+	
 }

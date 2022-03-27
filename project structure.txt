@@ -1,0 +1,35 @@
+features
+main!
+- select source encoding, target encoding, file or folder
+-> convert encoding of all files within folder to target encoding
+- specify file by: 
+	- file extension(by default only txt files, can change to accept all, or specific)
+	- checkbox hidden files
+	- regex script(display example)
+- working with io for now, might replace with nio later with research
+
+- detect encoding -> display sample text(first file, display file name)
+ and ask weather to use this charset
+- check if specific charset supported by this program
+- display text of several encoding as list(default charsets, choose others if needed)
+ 	- can select manual sample size, select certain file
+
+-add BOM, display information about BOM
+	- check if bom already there, can add or remove
+
+additional:
+- change file extensions
+- rename using regex(later)
+- line operators? need to research more later
+- etc
+
+GUI
+- semantic version control
+- github link, about
+- dropdown menu of basic charsets, select by language?
+- using java swing, maybe practice javafx later
+- select files by dragging
+
+Questions
+- charsetDecoder.isAutodetected(): if implementing auto-detecting charset, what is auto
+detecting charset
