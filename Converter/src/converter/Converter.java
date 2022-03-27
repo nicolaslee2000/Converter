@@ -44,9 +44,6 @@ public class Converter {
 	Converter(String filePath) {
 		this();
 		this.file = new File(filePath);
-		System.out.println("all files : " + FileHandling.getAllFiles(file));
-		System.out.println("files with txt only : " +FileHandling.getAllFiles(file,"txt"));
-		System.out.println("getallfiles" + FileHandling.getAllFiles(new File("C:\\Users\\nicol\\Documents\\converting with java\\Testfolder\\javalec\\basic")));
 	}
 	
 	public void changeExtension(String ext) {
