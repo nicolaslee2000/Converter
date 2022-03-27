@@ -26,6 +26,7 @@ public class Main {
 		//Converter.rewrite(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01 - Copy.txt"));
 		//Converter.convert(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01short.txt"));
 		//Converter.euc(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01short1.txt"));
+		//gittest
 	
 		
 		 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt"), "euc-kr"));
