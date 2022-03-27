@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		
 		//Converter.changeExtension(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01.java"), ".txt");
 		//Converter.rewrite(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01 - Copy.txt"));
@@ -28,21 +28,10 @@ public class Main {
 		//Converter.euc(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01short1.txt"));
 		
 		
-		
-		 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt"), "euc-kr"));
-	     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\nicol\\Documents\\converting with java\\plz.txt"), "utf-8")); 
-	          char[] buffer = new char[16384];
-	          String read;
-	          String st = "";
-	          while ((read = br.readLine()) != null) {
-	        	  st+= read;
-	        	  bw.write(st);
-	          }
-	             
-	    System.out.println(st);      
-		br.close();
-		bw.close();
 		//Converter.changeExtension(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt"), ".java");
+		Converter converter = new Converter("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt");
+		System.out.println(converter.detectFileEncoding());
+		converter.transform();
 	   }
 }
 		
