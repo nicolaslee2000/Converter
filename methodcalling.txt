@@ -1,0 +1,33 @@
+package test;
+
+import java.io.File;
+import java.util.HashSet;
+
+class TestClass {
+	static HashSet<File> listOfFiles = new HashSet<File>();
+	
+	//returns all files in the directory as a set
+	static HashSet<File> getAllFiles(File file) {
+		if(file.isDirectory()) {
+			for(File subFiles : file.listFiles()) {
+				if(subFiles.isDirectory()) {
+					getAllFiles(subFiles);
+				} else {
+					listOfFiles.add(subFiles);				
+					}
+			}
+		} else {
+			listOfFiles.add(file);				
+			}
+//		listOfFiles.clear();
+		return listOfFiles;
+	}
+}
+
+public class Test {
+	public static void main(String[] args) {
+		TestClass.getAllFiles(new File("C:\\Users\\user\\Documents")).forEach(System.out::println);
+		TestClass.getAllFiles(new File("C:\\Users\\user\\Desktop")).forEach(System.out::println);
+		
+	}
+}

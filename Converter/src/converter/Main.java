@@ -29,9 +29,8 @@ public class Main {
 		
 		
 		//Converter.changeExtension(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt"), ".java");
-		Converter converter = new Converter("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt");
-		System.out.println(converter.detectFileEncoding());
-		converter.transform();
+		Converter converter = new Converter("C:\\Users\\nicol\\Documents\\converting with java\\Testfolder");
+		
 	   }
 }
 		

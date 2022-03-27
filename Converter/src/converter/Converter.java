@@ -15,7 +15,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Nicolaslee
@@ -32,6 +34,7 @@ public class Converter {
 	Converter() {
 		availableCharsets = Charset.availableCharsets();
 		charsetsToBeTested = new String[]{"UTF-8", "windows-1253", "ISO-8859-7", "euc-kr"};
+		
 	}
 	Converter(File file) {
 		this();
@@ -41,13 +44,15 @@ public class Converter {
 	Converter(String filePath) {
 		this();
 		this.file = new File(filePath);
+		System.out.println("all files : " + FileHandling.getAllFiles(file));
+		System.out.println("files with txt only : " +FileHandling.getAllFiles(file,"txt"));
+		System.out.println("getallfiles" + FileHandling.getAllFiles(new File("C:\\Users\\nicol\\Documents\\converting with java\\Testfolder\\javalec\\basic")));
 	}
 	
 	public void changeExtension(String ext) {
 
 		int index = file.getAbsolutePath().lastIndexOf(".");
-		file.renameTo(new File(file.getAbsolutePath().substring(0, index) + ext));
-		
+		file.renameTo(new File(file.getAbsolutePath().substring(0, index + 1) + ext));
 	}
 	
 	public void transform() {
@@ -92,6 +97,42 @@ public class Converter {
 			e.printStackTrace();
 		}
 		return charset;
+	}
+	
+	//nested static class for readability. Use for getAllFiles methods only.
+	private static class FileHandling {
+		private FileHandling() {
+		}
+		
+		static HashSet<File> getAllFiles(File file) {
+			HashSet<File> listOfFiles = new HashSet<File>();
+	        if(file.isDirectory()) {
+	            for(File subFiles : file.listFiles()) {
+	                if(subFiles.isDirectory()) {
+	                    listOfFiles.addAll(getAllFiles(subFiles));
+	                } else {
+	                    listOfFiles.add(subFiles);              
+	                    }
+	            }
+	        } else {
+	            listOfFiles.add(file);              
+	        }
+	        return listOfFiles;
+	    }
+		private static HashSet<File> getAllFiles(File file, String... extension) {
+			HashSet<File> set = new HashSet<File>();
+			for(String ext : extension) {
+				for(File fl : getAllFiles(file)) {
+					int index = fl.getAbsolutePath().lastIndexOf(".");
+					if(fl.getAbsolutePath().substring(index+1).equals(ext)) {
+						set.add(fl);
+					}
+				}
+			}
+			return set;
+		}
+		
+
 	}
 	
 }

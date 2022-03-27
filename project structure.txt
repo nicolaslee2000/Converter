@@ -6,7 +6,7 @@ main!
 	- file extension(by default only txt files, can change to accept all, or specific), or multiple extensions
 	- checkbox hidden files
 	- regex script(display example)
-- working with io for now, might replace with nio later with research
+- working with io for now, might replace with nio later with research, try using foreach
 
 - detect encoding -> display sample text(first file, display file name)
  and ask weather to use this charset
