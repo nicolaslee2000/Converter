@@ -49,10 +49,10 @@ public class CharsetDetector {
             return null;
         }
     }
-
+    String str = "";
     private boolean identify(byte[] bytes, CharsetDecoder decoder) {
         try {
-            decoder.decode(ByteBuffer.wrap(bytes));
+            str = (decoder.decode(ByteBuffer.wrap(bytes))).toString();
         } catch (CharacterCodingException e) {
             return false;
         }
@@ -69,19 +69,19 @@ public class CharsetDetector {
         System.out.println(charset);
 
         if (charset != null) {
-            try {
-                InputStreamReader reader = new InputStreamReader(new FileInputStream(f), charset);
-                int c = 0;
-                while ((c = reader.read()) != -1) {
-                    System.out.print((char)c);
-                }
-                reader.close();
-            } catch (FileNotFoundException fnfe) {
-                fnfe.printStackTrace();
-            }catch(IOException ioe){
-                ioe.printStackTrace();
-            }
-
+//            try {
+//                InputStreamReader reader = new InputStreamReader(new FileInputStream(f), charset);
+//                int c = 0;
+//                while ((c = reader.read()) != -1) {
+//                    System.out.print((char)c);
+//                }
+//                reader.close();
+//            } catch (FileNotFoundException fnfe) {
+//                fnfe.printStackTrace();
+//            }catch(IOException ioe){
+//                ioe.printStackTrace();
+//            }
+        	System.out.println(cd.str);
         }else{
             System.out.println("Unrecognized charset.");
         }

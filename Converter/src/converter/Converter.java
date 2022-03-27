@@ -37,12 +37,7 @@ public class Converter {
 		file.renameTo(new File(file.getAbsolutePath().substring(0, index) + ext));
 		System.out.println(file);
 	}
-
-
-
-
 	
-
 	public static void transform(File source, String srcEncoding, File target, String tgtEncoding) throws IOException {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(source), srcEncoding));
 				BufferedWriter bw = new BufferedWriter(
