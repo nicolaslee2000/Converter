@@ -47,3 +47,8 @@ check if file has extension or not
 check access modifiers
 comments
 error catching
+
+3/29
+netbeans gu quickstart
+jfilechooser
+flatlaf demo
