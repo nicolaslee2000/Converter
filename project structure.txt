@@ -4,7 +4,8 @@ main!
 -> convert encoding of all files within folder to target encoding
 - specify file by: 
 	- file extension(by default only txt files, can change to accept all, or specific), 
-	or multiple extensions, select without '.'
+	or multiple extensions, select without '.' warning when changing from default txt
+	can damage other files(image)
 	- checkbox hidden files
 	- regex script(display example)
 	- specify target folder/or make copy next to source folder(convertingwithjava - copy)

@@ -45,9 +45,7 @@ public class Converter {
 		this();
 		root = new File(filePath);
 		files.addAll(FileHandling.getAllFiles(root));
-	
-		transform(files, new File("C:\\Users\\nicol\\Documents\\converting with java\\Testfolder - Copy"));
-	}
+		}
 		
 //	public void changeExtension(String ext) {
 //
@@ -59,7 +57,7 @@ public class Converter {
 	//if tgFolder is null automatically create copy of rootFolder to put converted files to. Otherwise put files to tgFolder
 	//use NIO to copy entire directory, possibly decoding while copying file(combine transform and convert)
 	//TODO ask if here is an easier way
-	public void transform(HashSet<File> files, File tgFolder) {
+	private void transform(HashSet<File> files, File tgFolder) {
 		
 		//had to use NIO to get relative path
 		File folder = tgFolder == null ? new File(root.getParent(), root.getName()+" - Copy") : tgFolder;
@@ -74,7 +72,6 @@ public class Converter {
 			}
 			convert(file, sf, Charset.forName("euc-kr"), Charset.forName("utf-8"));
 		}
-		
 	}
 
 	

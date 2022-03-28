@@ -19,18 +19,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.UIManager;
+
 public class Main {
 	public static void main(String[] args) {
-		
-		//Converter.changeExtension(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01.java"), ".txt");
-		//Converter.rewrite(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01 - Copy.txt"));
-		//Converter.convert(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01short.txt"));
-		//Converter.euc(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01short1.txt"));
-		
-		
-		//Converter.changeExtension(new File("C:\\Users\\nicol\\Documents\\converting with java\\Test01.txt"), ".java");
-		Converter converter = new Converter("C:\\Users\\nicol\\Documents\\converting with java\\Testfolder");
-		
-	   }
+	
+	}
 }
 		
