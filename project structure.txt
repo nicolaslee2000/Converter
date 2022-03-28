@@ -33,6 +33,7 @@ GUI
 - dropdown menu of basic charsets, select by language?
 - using java swing, maybe practice javafx later
 - select files by dragging
+- use flatlaf demo, flatlaf 2.1
 
 Questions
 - charsetDecoder.isAutodetected(): if implementing auto-detecting charset, what is auto
