@@ -3,10 +3,13 @@ main!
 - select source encoding, target encoding, file or folder
 -> convert encoding of all files within folder to target encoding
 - specify file by: 
-	- file extension(by default only txt files, can change to accept all, or specific), or multiple extensions
+	- file extension(by default only txt files, can change to accept all, or specific), 
+	or multiple extensions, select without '.'
 	- checkbox hidden files
 	- regex script(display example)
+	- specify target folder/or make copy next to source folder(convertingwithjava - copy)
 - working with io for now, might replace with nio later with research, try using foreach
+	learn about recursion
 
 - detect encoding -> display sample text(first file, display file name)
  and ask weather to use this charset
@@ -33,3 +36,11 @@ GUI
 Questions
 - charsetDecoder.isAutodetected(): if implementing auto-detecting charset, what is auto
 detecting charset
+-path.relativize
+
+
+Final
+check if file has extension or not
+check access modifiers
+comments
+error catching
