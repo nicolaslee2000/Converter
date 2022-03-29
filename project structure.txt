@@ -1,4 +1,4 @@
-features
+https://docs.google.com/spreadsheets/d/1xBJOCjfKOzEee2idjPTh9Fsov2wXb-14RXnV3aA9o3k/edit?usp=sharing
 
 ***make a checklist
 main!
@@ -19,6 +19,7 @@ main!
 - check if specific charset supported by this program
 - display text of several encoding as list(default charsets, choose others if needed)
  	- can select manual sample size, select certain file
+-language selection
 
 -add BOM, display information about BOM
 	- check if bom already there, can add or remove
@@ -44,8 +45,11 @@ GUI
  -easy remove and select all button
 -jfilechooser set filter
  -show "drop file" pane, after file selected display table
+ -jfilechooser remember last path
 -add icons(arrow icon)
 -formattedtextfield
+-progress bar
+-jpopupmenu
 
 Questions
 - charsetDecoder.isAutodetected(): if implementing auto-detecting charset, what is auto
@@ -54,12 +58,6 @@ detecting charset
 
 
 Final
-check if file has extension or not
 check access modifiers
 comments
 error catching
-
-3/29
-netbeans gu quickstart
-jfilechooser
-flatlaf demo
