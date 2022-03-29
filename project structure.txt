@@ -1,4 +1,6 @@
 features
+
+***make a checklist
 main!
 - select source encoding, target encoding, file or folder
 -> convert encoding of all files within folder to target encoding
@@ -35,6 +37,15 @@ GUI
 - dropdown menu of basic charsets, select by language?
 - using java swing, maybe practice javafx later
 - select files by dragging
+
+-GUI features
+-jtable
+ -warning tooltip to encoding
+ -easy remove and select all button
+-jfilechooser set filter
+ -show "drop file" pane, after file selected display table
+-add icons(arrow icon)
+-formattedtextfield
 
 Questions
 - charsetDecoder.isAutodetected(): if implementing auto-detecting charset, what is auto
