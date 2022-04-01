@@ -1,6 +1,5 @@
 package converter;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,10 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -46,13 +44,41 @@ public class Converter {
 		root = new File(filePath);
 		files.addAll(FileHandling.getAllFiles(root));
 		}
+	
+	//TODO change later
+	public void changeExtension(String ext) {
+		for(File f:files) {
+			int index = f.getAbsolutePath().lastIndexOf(".");
+			f.renameTo(new File(f.getAbsolutePath().substring(0, index + 1) + ext));
+		}
 		
-//	public void changeExtension(String ext) {
-//
-//		int index = file.getAbsolutePath().lastIndexOf(".");
-//		file.renameTo(new File(file.getAbsolutePath().substring(0, index + 1) + ext));
-//	}
-
+	}
+	
+	//TODO remove later
+	public void checkText() {
+		HashSet<File> hs = new HashSet<>();
+		for(File f:files) {
+			Path fileName
+            = Path.of(f.getAbsolutePath());
+ 
+        // Now calling Files.readString() method to
+        // read the file
+        try {
+			String str = Files.readString(fileName);
+			if(str.toLowerCase().contains("grayfilter")) {
+				hs.add(f);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		}
+		for(File ff : hs) {
+			System.out.println(ff);
+		}
+		
+	}
+	
 	
 	//if tgFolder is null automatically create copy of rootFolder to put converted files to. Otherwise put files to tgFolder
 	//use NIO to copy entire directory, possibly decoding while copying file(combine transform and convert)
