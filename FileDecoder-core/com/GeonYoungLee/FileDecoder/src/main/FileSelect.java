@@ -1,4 +1,4 @@
-package guifordecoder;
+package main;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -12,7 +12,7 @@ public class FileSelect {
     private HashSet<File> files;
     private HashMap<String, HashSet<File>> tempfiles;
     
-    FileSelect() {
+    public FileSelect() {
             files = new HashSet<>();
             tempfiles = new HashMap<>();
     }

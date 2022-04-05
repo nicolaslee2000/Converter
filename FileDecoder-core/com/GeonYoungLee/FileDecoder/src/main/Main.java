@@ -1,4 +1,6 @@
-package guifordecoder;
+package main;
+
+import gui.MainFrame;
 
 /**
  *

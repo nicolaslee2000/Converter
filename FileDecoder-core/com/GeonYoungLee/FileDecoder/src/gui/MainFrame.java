@@ -1,4 +1,4 @@
-package guifordecoder;
+package gui;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -34,6 +34,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
+
+import main.FileDecoder;
+import main.FileEncodingDetector;
+import main.FileHandler;
+import main.FileSelect;
 
 /**
  *

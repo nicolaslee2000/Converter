@@ -1,4 +1,4 @@
-package guifordecoder;
+package main;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

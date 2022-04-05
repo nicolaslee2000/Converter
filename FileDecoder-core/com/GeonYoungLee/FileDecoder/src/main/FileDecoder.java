@@ -1,4 +1,4 @@
-package guifordecoder;
+package main;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class FileDecoder extends Decoder{
 	private Charset targetCharset;
 	private boolean overwrite;
 	private File targetFolder;
-	FileDecoder() {
+	public FileDecoder() {
 	      super();
 	}
 	public Set<File> getSourceFiles() {
