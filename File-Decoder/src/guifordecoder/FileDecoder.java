@@ -1,4 +1,4 @@
-package filedecoder;
+package guifordecoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,23 +12,36 @@ public class FileDecoder extends Decoder{
 	private Charset targetCharset;
 	private boolean overwrite;
 	private File targetFolder;
-	
-	public void setSourceFiles(HashSet<File> sourceFiles) {
+	FileDecoder() {
+	      super();
+	}
+	public Set<File> getSourceFiles() {
+		return sourceFiles;
+	}
+	public void setSourceFiles(Set<File> sourceFiles) {
 		this.sourceFiles = sourceFiles;
 	}
-
+	public Charset getSourceCharset() {
+		return sourceCharset;
+	}
 	public void setSourceCharset(Charset sourceCharset) {
 		this.sourceCharset = sourceCharset;
 	}
-
+	public Charset getTargetCharset() {
+		return targetCharset;
+	}
 	public void setTargetCharset(Charset targetCharset) {
 		this.targetCharset = targetCharset;
 	}
-
+	public boolean isOverwrite() {
+		return overwrite;
+	}
 	public void setOverwrite(boolean overwrite) {
 		this.overwrite = overwrite;
 	}
-
+	public File getTargetFolder() {
+		return targetFolder;
+	}
 	public void setTargetFolder(File targetFolder) {
 		this.targetFolder = targetFolder;
 	}

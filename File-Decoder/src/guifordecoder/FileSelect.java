@@ -1,4 +1,4 @@
-package filedecoder;
+package guifordecoder;
 
 import java.io.File;
 import java.io.FileFilter;
