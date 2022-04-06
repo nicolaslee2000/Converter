@@ -15,13 +15,17 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -32,6 +36,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
+import main.Decoder;
+
 import main.FileDecoder;
 import main.FileEncodingDetector;
 import main.FileHandler;
@@ -49,8 +55,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     public MainFrame() {
         initFileSelect();
-        initFileDecoder();
-        initFileEncodingDetector();
+        initDecoder();
         initFileHandler();
         initComponents();
     }
@@ -65,151 +70,148 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         fileChooser = new javax.swing.JFileChooser();
-        buttongroupExt = new javax.swing.ButtonGroup();
-        dialogSelectEncoding = new javax.swing.JDialog();
+        btngFilterExt = new javax.swing.ButtonGroup();
+        dgSelectencoding = new javax.swing.JDialog();
 
-        jPanel4 = new javax.swing.JPanel();
+        pSelectencoding = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableEncoding = new javax.swing.JTable();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        dialogAuto = new javax.swing.JDialog();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        labelDetectedencoding = new javax.swing.JLabel();
-        jButton8 = new javax.swing.JButton();
+        tbSelectencoding = new javax.swing.JTable();
+        btnSelectencodingOk = new javax.swing.JButton();
+        btnSelectencodingCancel = new javax.swing.JButton();
+        dgAuto = new javax.swing.JDialog();
+        pAuto = new javax.swing.JPanel();
+        lbAutoSuggested = new javax.swing.JLabel();
+        lbAutoEncoding = new javax.swing.JLabel();
+        btnAutoHelp = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        textareaDetectedencoding = new javax.swing.JTextArea();
-        jLabel11 = new javax.swing.JLabel();
-        jButton11 = new javax.swing.JButton();
-        dialogBrute = new javax.swing.JDialog();
-        jPanel6 = new javax.swing.JPanel();
+        txtaAutoEncodings = new javax.swing.JTextArea();
+        lbAutoSample = new javax.swing.JLabel();
+        btnAutoOk = new javax.swing.JButton();
+        dgBrute = new javax.swing.JDialog();
+        pBrute = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        textareaBrute = new javax.swing.JTextArea();
-        jButton13 = new javax.swing.JButton();
-        dialogSearchResult = new javax.swing.JDialog();
-        jPanel10 = new javax.swing.JPanel();
-        jButton15 = new javax.swing.JButton();
-        labelFilescontaining = new javax.swing.JLabel();
+        txtaBruteEncodings = new javax.swing.JTextArea();
+        btnBruteOk = new javax.swing.JButton();
+        dgSearch = new javax.swing.JDialog();
+        pSearch = new javax.swing.JPanel();
+        btnSearchCancel = new javax.swing.JButton();
+        lbSearchContaining = new javax.swing.JLabel();
         subPanelFilesScroll1 = new javax.swing.JScrollPane();
-        tableFiles1 = new javax.swing.JTable();
-        jButton16 = new javax.swing.JButton();
+        tbSearchFiles = new javax.swing.JTable();
+        btnSearchOpen = new javax.swing.JButton();
         jMenuItem1 = new javax.swing.JMenuItem();
-        buttongroupTargetfolder = new javax.swing.ButtonGroup();
-        buttongroupDetectencoding = new javax.swing.ButtonGroup();
-        buttongroupFileext = new javax.swing.ButtonGroup();
-        buttongroupRemanefiles = new javax.swing.ButtonGroup();
-        buttongroupSearchfilecontent = new javax.swing.ButtonGroup();
-        panelFiles = new javax.swing.JPanel();
-        subPanelTool = new javax.swing.JPanel();
-        buttonOF = new javax.swing.JButton();
-        buttonRemove = new javax.swing.JButton();
-        buttonRemoveAll = new javax.swing.JButton();
-        buttonSelectAll = new javax.swing.JCheckBox();
-        panelFileFilters = new javax.swing.JPanel();
-        lableExt = new javax.swing.JLabel();
-        radiobuttonAll = new javax.swing.JRadioButton();
-        radioButtonOther = new javax.swing.JRadioButton();
-        textFieldExt = new javax.swing.JTextField();
-        checkBoxHiddenFiles = new javax.swing.JCheckBox();
-        checkboxFileName = new javax.swing.JCheckBox();
-        textFieldFileName = new javax.swing.JTextField();
-        checkboxRegex = new javax.swing.JCheckBox();
-        textfieldRegex = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
-        panelCard = new javax.swing.JPanel();
-        subPanelDragDrop = new javax.swing.JPanel();
-        panelDragDrop2 = new javax.swing.JPanel();
-        labelDropFile = new javax.swing.JLabel();
-        labelUploadIcon = new javax.swing.JLabel();
-        labelOr = new javax.swing.JLabel();
+        btngDecodeFolder = new javax.swing.ButtonGroup();
+        btngDetect = new javax.swing.ButtonGroup();
+        btngHdExt = new javax.swing.ButtonGroup();
+        btngHdRename = new javax.swing.ButtonGroup();
+        btngHdSearch = new javax.swing.ButtonGroup();
+        dialogAbout = new javax.swing.JDialog();
+        jButton1 = new javax.swing.JButton();
+        pFiles = new javax.swing.JPanel();
+        spTools = new javax.swing.JPanel();
+        btnFileOpen = new javax.swing.JButton();
+        btnFileRemove = new javax.swing.JButton();
+        btnFileRemoveall = new javax.swing.JButton();
+        cbFileSelectall = new javax.swing.JCheckBox();
+        spFilter = new javax.swing.JPanel();
+        lbFilterExt = new javax.swing.JLabel();
+        rbtnFilterAll = new javax.swing.JRadioButton();
+        rbtnFilterOther = new javax.swing.JRadioButton();
+        txtfFilterExt = new javax.swing.JTextField();
+        cbFilterHidden = new javax.swing.JCheckBox();
+        cbFilterFilename = new javax.swing.JCheckBox();
+        txtfFilterFilename = new javax.swing.JTextField();
+        cbFilterRegex = new javax.swing.JCheckBox();
+        txtfFilterRegex = new javax.swing.JTextField();
+        separatorFilter = new javax.swing.JSeparator();
+        spcard = new javax.swing.JPanel();
+        sspDragdrop = new javax.swing.JPanel();
+        ssspDragdrop2 = new javax.swing.JPanel();
+        lbDragdropFiles = new javax.swing.JLabel();
+        lbDragdropUploadicon = new javax.swing.JLabel();
+        lbDragdropOr = new javax.swing.JLabel();
         buttonBrowseFile = new javax.swing.JButton();
-        panelDragDrop3 = new javax.swing.JPanel();
-        panelDragDrop1 = new javax.swing.JPanel();
-        subPanelFilesScroll = new javax.swing.JScrollPane();
-        tableFiles = new javax.swing.JTable();
+        sspDragdrop3 = new javax.swing.JPanel();
+        sspDragdrop1 = new javax.swing.JPanel();
+        sspFilesscroll = new javax.swing.JScrollPane();
+        tbFileFiles = new javax.swing.JTable();
         panelFunctions = new javax.swing.JPanel();
         tabbedPane = new javax.swing.JTabbedPane();
-        subPanelDecode = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        comboboxSourceEncoding = new javax.swing.JComboBox<>();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        comboboxTargetEncoding = new javax.swing.JComboBox<>();
-        jSeparator2 = new javax.swing.JSeparator();
-        jPanel2 = new javax.swing.JPanel();
-        buttonDecode = new javax.swing.JButton();
-        textfieldTargetfolder = new javax.swing.JTextField();
-        buttonChoosetarget = new javax.swing.JButton();
-        radiobuttonTargetfolder = new javax.swing.JRadioButton();
-        radiobuttonOverwriteall = new javax.swing.JRadioButton();
-        subPanelDetectEncoding = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        buttonSelectEncoding = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        buttonChoosesample = new javax.swing.JButton();
-        labelSamplefile = new javax.swing.JLabel();
-        radioAuto = new javax.swing.JRadioButton();
-        radioBrute = new javax.swing.JRadioButton();
-        jSeparator3 = new javax.swing.JSeparator();
-        buttonDetectencoding = new javax.swing.JButton();
-        labelSamplesize = new javax.swing.JLabel();
-        labelChoosesample = new javax.swing.JLabel();
-        textfieldSamplesize = new JFormattedTextField(setNumberformatter(textfieldSamplesize));
+        spDecode = new javax.swing.JPanel();
+        sspDecode1 = new javax.swing.JPanel();
+        lbDecodeSourceencoding = new javax.swing.JLabel();
+        cbDecodeSourceencoding = new javax.swing.JComboBox<>();
+        lbDecodeArrow = new javax.swing.JLabel();
+        lbDecodeTargetencoding = new javax.swing.JLabel();
+        cbDecodeTargetencoding = new javax.swing.JComboBox<>();
+        separatorDecode = new javax.swing.JSeparator();
+        sspDecode2 = new javax.swing.JPanel();
+        btnDecodeDecode = new javax.swing.JButton();
+        txtfDecodeTargetfolder = new javax.swing.JTextField();
+        btnDecodeChoose = new javax.swing.JButton();
+        rbtnTargetfolder = new javax.swing.JRadioButton();
+        rbtnDecodeOverwrite = new javax.swing.JRadioButton();
+        spDetect = new javax.swing.JPanel();
+        sspDetect = new javax.swing.JPanel();
+        btnDetectSelectencoding = new javax.swing.JButton();
+        btnDetectHelp = new javax.swing.JButton();
+        btnDetectChoosefile = new javax.swing.JButton();
+        lbDetectSample = new javax.swing.JLabel();
+        rbtnDetectAuto = new javax.swing.JRadioButton();
+        rbtnDetectBrute = new javax.swing.JRadioButton();
+        separatorDetect = new javax.swing.JSeparator();
+        btnDetectDetect = new javax.swing.JButton();
+        lbDetectSamplesize = new javax.swing.JLabel();
+        lbDetectChoosesample = new javax.swing.JLabel();
+        txtfDetectSamplesize = new JFormattedTextField(setNumberformatter(txtfDetectSamplesize));
         jScrollPane6 = new javax.swing.JScrollPane();
-        textareaSelectedencodings = new javax.swing.JTextArea();
-        subPanelFileHandling = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jRadioButton7 = new javax.swing.JRadioButton();
-        radiobuttonOtherChangeExt = new javax.swing.JRadioButton();
-        textfieldChangeext = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        textfieldTargetChangeExt = new javax.swing.JTextField();
-        buttonChangeFileExt = new javax.swing.JButton();
-        jSeparator4 = new javax.swing.JSeparator();
-        jPanel8 = new javax.swing.JPanel();
-        jLabel15 = new javax.swing.JLabel();
-        radiobuttonRenameall = new javax.swing.JRadioButton();
-        radiobuttonReplace = new javax.swing.JRadioButton();
-        textfieldRenamereplace = new javax.swing.JTextField();
-        jLabel16 = new javax.swing.JLabel();
-        textfieldRenametarget = new javax.swing.JTextField();
-        jSeparator5 = new javax.swing.JSeparator();
-        jButton12 = new javax.swing.JButton();
-        jLabel17 = new javax.swing.JLabel();
-        checkboxRenameregex = new javax.swing.JCheckBox();
-        jPanel9 = new javax.swing.JPanel();
-        jLabel18 = new javax.swing.JLabel();
-        jButton14 = new javax.swing.JButton();
-        jLabel19 = new javax.swing.JLabel();
-        jRadioButton11 = new javax.swing.JRadioButton();
-        radiofilesearchregex = new javax.swing.JRadioButton();
+        txtareaDetectSelectedencodings = new javax.swing.JTextArea();
+        spHd = new javax.swing.JPanel();
+        sspHdExt = new javax.swing.JPanel();
+        lbhdExtExt = new javax.swing.JLabel();
+        rbtnHdExtAll = new javax.swing.JRadioButton();
+        rbtnHdExtOther = new javax.swing.JRadioButton();
+        txtfHdExtOther = new javax.swing.JTextField();
+        lbHdExtArrow = new javax.swing.JLabel();
+        lbHdExtTarget = new javax.swing.JLabel();
+        txtfHdExtTarget = new javax.swing.JTextField();
+        btnHdExtChange = new javax.swing.JButton();
+        separatorHdExt = new javax.swing.JSeparator();
+        sspHdrename = new javax.swing.JPanel();
+        lbHdRename = new javax.swing.JLabel();
+        rbtnHdRenameall = new javax.swing.JRadioButton();
+        rbtnHdReplace = new javax.swing.JRadioButton();
+        txtfRenameReplace = new javax.swing.JTextField();
+        lbHdRenameArrow = new javax.swing.JLabel();
+        txtfHdRenameTarget = new javax.swing.JTextField();
+        separatorHdRename = new javax.swing.JSeparator();
+        btnHdRenameRename = new javax.swing.JButton();
+        lbHdRenameTarget = new javax.swing.JLabel();
+        cbHdRenameRegex = new javax.swing.JCheckBox();
+        sspHdSearch = new javax.swing.JPanel();
+        lbHdSearch = new javax.swing.JLabel();
+        btnHdSearchSearch = new javax.swing.JButton();
+        lbHdSearchSearchby = new javax.swing.JLabel();
+        rbtnHdSearchText = new javax.swing.JRadioButton();
+        rbtnHdSearchRegex = new javax.swing.JRadioButton();
         jScrollPane5 = new javax.swing.JScrollPane();
-        textareaSearchfilecontent = new javax.swing.JTextArea();
+        txtareaHdSearch = new javax.swing.JTextArea();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuEdit = new javax.swing.JMenu();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
-        fileChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fileChooserActionPerformed(evt);
-            }
-        });
+        dgSelectencoding.setTitle("Select Encodings");
+        dgSelectencoding.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        dgSelectencoding.setFocusCycleRoot(false);
+        dgSelectencoding.setModal(true);
+        dgSelectencoding.setPreferredSize(new java.awt.Dimension(310, 500));
+        dgSelectencoding.setSize(new java.awt.Dimension(310, 500));
+        dgSelectencoding.setType(java.awt.Window.Type.POPUP);
 
-        dialogSelectEncoding.setTitle("Select Encodings");
-        dialogSelectEncoding.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        dialogSelectEncoding.setFocusCycleRoot(false);
-        dialogSelectEncoding.setModal(true);
-        dialogSelectEncoding.setPreferredSize(new java.awt.Dimension(310, 500));
-        dialogSelectEncoding.setSize(new java.awt.Dimension(310, 500));
-        dialogSelectEncoding.setType(java.awt.Window.Type.POPUP);
-
-        tableEncoding.setAutoCreateRowSorter(true);
-        tableEncoding.setModel(new javax.swing.table.DefaultTableModel(
+        tbSelectencoding.setAutoCreateRowSorter(true);
+        tbSelectencoding.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -232,225 +234,225 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tableEncoding);
-        if (tableEncoding.getColumnModel().getColumnCount() > 0) {
-            tableEncoding.getColumnModel().getColumn(0).setResizable(false);
-            tableEncoding.getColumnModel().getColumn(1).setMinWidth(50);
-            tableEncoding.getColumnModel().getColumn(1).setPreferredWidth(30);
-            tableEncoding.getColumnModel().getColumn(1).setMaxWidth(50);
+        jScrollPane1.setViewportView(tbSelectencoding);
+        if (tbSelectencoding.getColumnModel().getColumnCount() > 0) {
+            tbSelectencoding.getColumnModel().getColumn(0).setResizable(false);
+            tbSelectencoding.getColumnModel().getColumn(1).setMinWidth(50);
+            tbSelectencoding.getColumnModel().getColumn(1).setPreferredWidth(30);
+            tbSelectencoding.getColumnModel().getColumn(1).setMaxWidth(50);
         }
         setTableEncoding();
 
-        jButton3.setText("OK");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnSelectencodingOk.setText("OK");
+        btnSelectencodingOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnSelectencodingOkActionPerformed(evt);
             }
         });
 
-        jButton4.setText("Cancel");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnSelectencodingCancel.setText("Cancel");
+        btnSelectencodingCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnSelectencodingCancelActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout pSelectencodingLayout = new javax.swing.GroupLayout(pSelectencoding);
+        pSelectencoding.setLayout(pSelectencodingLayout);
+        pSelectencodingLayout.setHorizontalGroup(
+            pSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pSelectencodingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pSelectencodingLayout.createSequentialGroup()
                         .addGap(0, 148, Short.MAX_VALUE)
-                        .addComponent(jButton3)
+                        .addComponent(btnSelectencodingOk)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4)))
+                        .addComponent(btnSelectencodingCancel)))
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        pSelectencodingLayout.setVerticalGroup(
+            pSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pSelectencodingLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 160, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4))
+                .addGroup(pSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSelectencodingOk)
+                    .addComponent(btnSelectencodingCancel))
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout dialogSelectEncodingLayout = new javax.swing.GroupLayout(dialogSelectEncoding.getContentPane());
-        dialogSelectEncoding.getContentPane().setLayout(dialogSelectEncodingLayout);
-        dialogSelectEncodingLayout.setHorizontalGroup(
-            dialogSelectEncodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout dgSelectencodingLayout = new javax.swing.GroupLayout(dgSelectencoding.getContentPane());
+        dgSelectencoding.getContentPane().setLayout(dgSelectencodingLayout);
+        dgSelectencodingLayout.setHorizontalGroup(
+            dgSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pSelectencoding, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        dialogSelectEncodingLayout.setVerticalGroup(
-            dialogSelectEncodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        dgSelectencodingLayout.setVerticalGroup(
+            dgSelectencodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pSelectencoding, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        dialogSelectEncoding.getAccessibleContext().setAccessibleDescription("");
-        dialogSelectEncoding.getAccessibleContext().setAccessibleParent(this);
-        dialogSelectEncoding.setLocationRelativeTo(this);
+        dgSelectencoding.getAccessibleContext().setAccessibleDescription("");
+        dgSelectencoding.getAccessibleContext().setAccessibleParent(this);
+        dgSelectencoding.setLocationRelativeTo(this);
 
-        dialogAuto.setTitle("Result");
-        dialogAuto.setAlwaysOnTop(true);
-        dialogAuto.setModal(true);
-        dialogAuto.setType(java.awt.Window.Type.POPUP);
+        dgAuto.setTitle("Result");
+        dgAuto.setAlwaysOnTop(true);
+        dgAuto.setModal(true);
+        dgAuto.setType(java.awt.Window.Type.POPUP);
 
-        jLabel9.setText("Suggested source Encoding:");
+        lbAutoSuggested.setText("Suggested source Encoding:");
 
-        labelDetectedencoding.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        labelDetectedencoding.setText("jLabel10");
+        lbAutoEncoding.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lbAutoEncoding.setText("jLabel10");
 
-        jButton8.setText("help");
+        btnAutoHelp.setText("help");
 
-        textareaDetectedencoding.setEditable(false);
-        textareaDetectedencoding.setColumns(20);
-        textareaDetectedencoding.setRows(5);
-        jScrollPane3.setViewportView(textareaDetectedencoding);
+        txtaAutoEncodings.setEditable(false);
+        txtaAutoEncodings.setColumns(20);
+        txtaAutoEncodings.setRows(5);
+        jScrollPane3.setViewportView(txtaAutoEncodings);
 
-        jLabel11.setText("Sample Text");
+        lbAutoSample.setText("Sample Text");
 
-        jButton11.setText("OK");
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
+        btnAutoOk.setText("OK");
+        btnAutoOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
+                btnAutoOkActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout pAutoLayout = new javax.swing.GroupLayout(pAuto);
+        pAuto.setLayout(pAutoLayout);
+        pAutoLayout.setHorizontalGroup(
+            pAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pAutoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(pAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pAutoLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jLabel11)
+                        .addComponent(lbAutoSample)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pAutoLayout.createSequentialGroup()
+                        .addGroup(pAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel9)
+                            .addGroup(pAutoLayout.createSequentialGroup()
+                                .addComponent(lbAutoSuggested)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(labelDetectedencoding)
+                                .addComponent(lbAutoEncoding)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnAutoHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pAutoLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton11)
+                .addComponent(btnAutoOk)
                 .addContainerGap())
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        pAutoLayout.setVerticalGroup(
+            pAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pAutoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(labelDetectedencoding)
-                    .addComponent(jButton8))
+                .addGroup(pAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbAutoSuggested)
+                    .addComponent(lbAutoEncoding)
+                    .addComponent(btnAutoHelp))
                 .addGap(7, 7, 7)
-                .addComponent(jLabel11)
+                .addComponent(lbAutoSample)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton11)
+                .addComponent(btnAutoOk)
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout dialogAutoLayout = new javax.swing.GroupLayout(dialogAuto.getContentPane());
-        dialogAuto.getContentPane().setLayout(dialogAutoLayout);
-        dialogAutoLayout.setHorizontalGroup(
-            dialogAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout dgAutoLayout = new javax.swing.GroupLayout(dgAuto.getContentPane());
+        dgAuto.getContentPane().setLayout(dgAutoLayout);
+        dgAutoLayout.setHorizontalGroup(
+            dgAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pAuto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        dialogAutoLayout.setVerticalGroup(
-            dialogAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        dgAutoLayout.setVerticalGroup(
+            dgAutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pAuto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        dialogAuto.pack();
-        dialogAuto.setLocationRelativeTo(null);
+        dgAuto.pack();
+        dgAuto.setLocationRelativeTo(null);
 
-        dialogBrute.setTitle("Result");
-        dialogBrute.setAlwaysOnTop(true);
-        dialogBrute.setModal(true);
-        dialogBrute.setType(java.awt.Window.Type.POPUP);
+        dgBrute.setTitle("Result");
+        dgBrute.setAlwaysOnTop(true);
+        dgBrute.setModal(true);
+        dgBrute.setType(java.awt.Window.Type.POPUP);
 
-        textareaBrute.setEditable(false);
-        textareaBrute.setColumns(20);
-        textareaBrute.setRows(5);
-        jScrollPane4.setViewportView(textareaBrute);
+        txtaBruteEncodings.setEditable(false);
+        txtaBruteEncodings.setColumns(20);
+        txtaBruteEncodings.setRows(5);
+        jScrollPane4.setViewportView(txtaBruteEncodings);
 
-        jButton13.setText("OK");
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
+        btnBruteOk.setText("OK");
+        btnBruteOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
+                btnBruteOkActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
+        javax.swing.GroupLayout pBruteLayout = new javax.swing.GroupLayout(pBrute);
+        pBrute.setLayout(pBruteLayout);
+        pBruteLayout.setHorizontalGroup(
+            pBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pBruteLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pBruteLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton13)))
+                        .addComponent(btnBruteOk)))
                 .addContainerGap())
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+        pBruteLayout.setVerticalGroup(
+            pBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pBruteLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton13)
+                .addComponent(btnBruteOk)
                 .addGap(15, 15, 15))
         );
 
-        javax.swing.GroupLayout dialogBruteLayout = new javax.swing.GroupLayout(dialogBrute.getContentPane());
-        dialogBrute.getContentPane().setLayout(dialogBruteLayout);
-        dialogBruteLayout.setHorizontalGroup(
-            dialogBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout dgBruteLayout = new javax.swing.GroupLayout(dgBrute.getContentPane());
+        dgBrute.getContentPane().setLayout(dgBruteLayout);
+        dgBruteLayout.setHorizontalGroup(
+            dgBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pBrute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        dialogBruteLayout.setVerticalGroup(
-            dialogBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        dgBruteLayout.setVerticalGroup(
+            dgBruteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pBrute, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        dialogBrute.pack();
-        dialogBrute.setLocationRelativeTo(null);
+        dgBrute.pack();
+        dgBrute.setLocationRelativeTo(null);
 
-        dialogSearchResult.setTitle("Result");
-        dialogSearchResult.setAlwaysOnTop(true);
-        dialogSearchResult.setModal(true);
-        dialogSearchResult.setType(java.awt.Window.Type.POPUP);
+        dgSearch.setTitle("Result");
+        dgSearch.setAlwaysOnTop(true);
+        dgSearch.setModal(true);
+        dgSearch.setType(java.awt.Window.Type.POPUP);
 
-        jButton15.setText("Cancel");
-        jButton15.addActionListener(new java.awt.event.ActionListener() {
+        btnSearchCancel.setText("Cancel");
+        btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton15ActionPerformed(evt);
+                btnSearchCancelActionPerformed(evt);
             }
         });
 
-        labelFilescontaining.setText("Files containing : \"asdfasdfasdfdfasd\"");
+        lbSearchContaining.setText("Files containing : \"asdfasdfasdfdfasd\"");
 
-        tableFiles1.setAutoCreateRowSorter(true);
-        tableFiles1.setModel(new javax.swing.table.DefaultTableModel(
+        tbSearchFiles.setAutoCreateRowSorter(true);
+        tbSearchFiles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -473,293 +475,321 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        tableFiles1.setToolTipText("");
-        tableFiles1.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tableFiles1.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tableFiles1.setShowGrid(false);
-        tableFiles1.setShowHorizontalLines(true);
-        tableFiles1.getTableHeader().setReorderingAllowed(false);
-        subPanelFilesScroll1.setViewportView(tableFiles1);
-        tableFiles1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        if (tableFiles1.getColumnModel().getColumnCount() > 0) {
-            tableFiles1.getColumnModel().getColumn(0).setPreferredWidth(300);
-            tableFiles1.getColumnModel().getColumn(1).setPreferredWidth(50);
-            tableFiles1.getColumnModel().getColumn(2).setPreferredWidth(150);
-            tableFiles1.getColumnModel().getColumn(3).setPreferredWidth(50);
-            tableFiles1.getColumnModel().getColumn(4).setResizable(false);
-            tableFiles1.getColumnModel().getColumn(4).setPreferredWidth(20);
+        tbSearchFiles.setToolTipText("");
+        tbSearchFiles.setColumnSelectionAllowed(true);
+        tbSearchFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tbSearchFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tbSearchFiles.setShowGrid(false);
+        tbSearchFiles.setShowHorizontalLines(true);
+        tbSearchFiles.getTableHeader().setReorderingAllowed(false);
+        subPanelFilesScroll1.setViewportView(tbSearchFiles);
+        tbSearchFiles.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        if (tbSearchFiles.getColumnModel().getColumnCount() > 0) {
+            tbSearchFiles.getColumnModel().getColumn(0).setPreferredWidth(300);
+            tbSearchFiles.getColumnModel().getColumn(1).setPreferredWidth(50);
+            tbSearchFiles.getColumnModel().getColumn(2).setPreferredWidth(150);
+            tbSearchFiles.getColumnModel().getColumn(3).setPreferredWidth(50);
+            tbSearchFiles.getColumnModel().getColumn(4).setResizable(false);
+            tbSearchFiles.getColumnModel().getColumn(4).setPreferredWidth(20);
         }
 
-        jButton16.setText("Open");
-        jButton16.addActionListener(new java.awt.event.ActionListener() {
+        btnSearchOpen.setText("Open");
+        btnSearchOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton16ActionPerformed(evt);
+                btnSearchOpenActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
+        javax.swing.GroupLayout pSearchLayout = new javax.swing.GroupLayout(pSearch);
+        pSearch.setLayout(pSearchLayout);
+        pSearchLayout.setHorizontalGroup(
+            pSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pSearchLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(subPanelFilesScroll1, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
+                    .addGroup(pSearchLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton15))
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(labelFilescontaining)
+                        .addComponent(btnSearchCancel))
+                    .addGroup(pSearchLayout.createSequentialGroup()
+                        .addComponent(lbSearchContaining)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton16)))
+                        .addComponent(btnSearchOpen)))
                 .addContainerGap())
         );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
+        pSearchLayout.setVerticalGroup(
+            pSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pSearchLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelFilescontaining)
-                    .addComponent(jButton16))
+                .addGroup(pSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbSearchContaining)
+                    .addComponent(btnSearchOpen))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(subPanelFilesScroll1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton15)
+                .addComponent(btnSearchCancel)
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout dialogSearchResultLayout = new javax.swing.GroupLayout(dialogSearchResult.getContentPane());
-        dialogSearchResult.getContentPane().setLayout(dialogSearchResultLayout);
-        dialogSearchResultLayout.setHorizontalGroup(
-            dialogSearchResultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout dgSearchLayout = new javax.swing.GroupLayout(dgSearch.getContentPane());
+        dgSearch.getContentPane().setLayout(dgSearchLayout);
+        dgSearchLayout.setHorizontalGroup(
+            dgSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        dialogSearchResultLayout.setVerticalGroup(
-            dialogSearchResultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        dgSearchLayout.setVerticalGroup(
+            dgSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        dialogSearchResult.pack();
-        dialogSearchResult.setLocationRelativeTo(null);
+        dgSearch.pack();
+        dgSearch.setLocationRelativeTo(null);
 
         jMenuItem1.setText("jMenuItem1");
+
+        jButton1.setText("Source code: https://github.com/nicolaslee2000/File-Decoder.git");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dialogAboutLayout = new javax.swing.GroupLayout(dialogAbout.getContentPane());
+        dialogAbout.getContentPane().setLayout(dialogAboutLayout);
+        dialogAboutLayout.setHorizontalGroup(
+            dialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dialogAboutLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        dialogAboutLayout.setVerticalGroup(
+            dialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dialogAboutLayout.createSequentialGroup()
+                .addGap(72, 72, 72)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(143, Short.MAX_VALUE))
+        );
+
+        dialogAbout.pack();
+        dialogAbout.setLocationRelativeTo(null);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("File Decoder\n");
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(530, 550));
 
-        buttonOF.setText("Open File..");
-        buttonOF.addActionListener(new java.awt.event.ActionListener() {
+        btnFileOpen.setText("Open File..");
+        btnFileOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonOFActionPerformed(evt);
+                btnFileOpenActionPerformed(evt);
             }
         });
 
-        buttonRemove.setText("Remove");
-        buttonRemove.addActionListener(new java.awt.event.ActionListener() {
+        btnFileRemove.setText("Remove");
+        btnFileRemove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonRemoveActionPerformed(evt);
+                btnFileRemoveActionPerformed(evt);
             }
         });
 
-        buttonRemoveAll.setText("Remove All");
-        buttonRemoveAll.addActionListener(new java.awt.event.ActionListener() {
+        btnFileRemoveall.setText("Remove All");
+        btnFileRemoveall.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonRemoveAllActionPerformed(evt);
+                btnFileRemoveallActionPerformed(evt);
             }
         });
 
-        buttonSelectAll.setText("Select All");
-        buttonSelectAll.addActionListener(new java.awt.event.ActionListener() {
+        cbFileSelectall.setText("Select All");
+        cbFileSelectall.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSelectAllActionPerformed(evt);
+                cbFileSelectallActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout subPanelToolLayout = new javax.swing.GroupLayout(subPanelTool);
-        subPanelTool.setLayout(subPanelToolLayout);
-        subPanelToolLayout.setHorizontalGroup(
-            subPanelToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subPanelToolLayout.createSequentialGroup()
-                .addComponent(buttonOF)
+        javax.swing.GroupLayout spToolsLayout = new javax.swing.GroupLayout(spTools);
+        spTools.setLayout(spToolsLayout);
+        spToolsLayout.setHorizontalGroup(
+            spToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spToolsLayout.createSequentialGroup()
+                .addComponent(btnFileOpen)
                 .addGap(34, 34, 34)
-                .addComponent(buttonRemove)
+                .addComponent(btnFileRemove)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonRemoveAll)
+                .addComponent(btnFileRemoveall)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(buttonSelectAll)
+                .addComponent(cbFileSelectall)
                 .addContainerGap())
         );
-        subPanelToolLayout.setVerticalGroup(
-            subPanelToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subPanelToolLayout.createSequentialGroup()
-                .addGroup(subPanelToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonOF)
-                    .addComponent(buttonRemoveAll)
-                    .addComponent(buttonRemove)
-                    .addComponent(buttonSelectAll))
+        spToolsLayout.setVerticalGroup(
+            spToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spToolsLayout.createSequentialGroup()
+                .addGroup(spToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnFileOpen)
+                    .addComponent(btnFileRemoveall)
+                    .addComponent(btnFileRemove)
+                    .addComponent(cbFileSelectall))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        panelFileFilters.setBorder(javax.swing.BorderFactory.createTitledBorder("File filters\n"));
+        spFilter.setBorder(javax.swing.BorderFactory.createTitledBorder("File filters\n"));
 
-        lableExt.setText("Extension:");
+        lbFilterExt.setText("Extension:");
 
-        buttongroupExt.add(radiobuttonAll);
-        radiobuttonAll.setSelected(true);
-        radiobuttonAll.setText("All");
-        radiobuttonAll.addActionListener(new java.awt.event.ActionListener() {
+        btngFilterExt.add(rbtnFilterAll);
+        rbtnFilterAll.setSelected(true);
+        rbtnFilterAll.setText("All");
+        rbtnFilterAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonAllActionPerformed(evt);
+                rbtnFilterAllActionPerformed(evt);
             }
         });
 
-        buttongroupExt.add(radioButtonOther);
-        radioButtonOther.setText("Other:");
-        radioButtonOther.addActionListener(new java.awt.event.ActionListener() {
+        btngFilterExt.add(rbtnFilterOther);
+        rbtnFilterOther.setText("Other:");
+        rbtnFilterOther.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioButtonOtherActionPerformed(evt);
+                rbtnFilterOtherActionPerformed(evt);
             }
         });
 
-        textFieldExt.setForeground(java.awt.Color.lightGray);
-        textFieldExt.setText("txt");
-        textFieldExt.setToolTipText("");
-        textFieldExt.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtfFilterExt.setForeground(java.awt.Color.lightGray);
+        txtfFilterExt.setText("txt");
+        txtfFilterExt.setToolTipText("");
+        txtfFilterExt.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                textFieldExtFocusGained(evt);
+                txtfFilterExtFocusGained(evt);
             }
         });
-        textFieldExt.addActionListener(new java.awt.event.ActionListener() {
+        txtfFilterExt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textFieldExtActionPerformed(evt);
+                txtfFilterExtActionPerformed(evt);
             }
         });
 
-        checkBoxHiddenFiles.setSelected(true);
-        checkBoxHiddenFiles.setText("Hidden files");
-        checkBoxHiddenFiles.addActionListener(new java.awt.event.ActionListener() {
+        cbFilterHidden.setSelected(true);
+        cbFilterHidden.setText("Hidden files");
+        cbFilterHidden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkBoxHiddenFilesActionPerformed(evt);
+                cbFilterHiddenActionPerformed(evt);
             }
         });
 
-        checkboxFileName.setText("File name contains:");
-        checkboxFileName.addActionListener(new java.awt.event.ActionListener() {
+        cbFilterFilename.setText("File name contains:");
+        cbFilterFilename.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkboxFileNameActionPerformed(evt);
+                cbFilterFilenameActionPerformed(evt);
             }
         });
 
-        textFieldFileName.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtfFilterFilename.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                textFieldFileNameFocusGained(evt);
+                txtfFilterFilenameFocusGained(evt);
             }
         });
-        textFieldFileName.addActionListener(new java.awt.event.ActionListener() {
+        txtfFilterFilename.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textFieldFileNameActionPerformed(evt);
+                txtfFilterFilenameActionPerformed(evt);
             }
         });
 
-        checkboxRegex.setText("Regex script");
-        checkboxRegex.addActionListener(new java.awt.event.ActionListener() {
+        cbFilterRegex.setText("Regex script");
+        cbFilterRegex.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkboxRegexActionPerformed(evt);
+                cbFilterRegexActionPerformed(evt);
             }
         });
 
-        textfieldRegex.setForeground(java.awt.Color.lightGray);
-        textfieldRegex.setText("ex: \\\\D[a-zA-Z]");
-        textfieldRegex.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtfFilterRegex.setForeground(java.awt.Color.lightGray);
+        txtfFilterRegex.setText("ex: \\\\D[a-zA-Z]");
+        txtfFilterRegex.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                textfieldRegexFocusGained(evt);
+                txtfFilterRegexFocusGained(evt);
             }
         });
-        textfieldRegex.addActionListener(new java.awt.event.ActionListener() {
+        txtfFilterRegex.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textfieldRegexActionPerformed(evt);
+                txtfFilterRegexActionPerformed(evt);
             }
         });
 
-        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        separatorFilter.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        javax.swing.GroupLayout panelFileFiltersLayout = new javax.swing.GroupLayout(panelFileFilters);
-        panelFileFilters.setLayout(panelFileFiltersLayout);
-        panelFileFiltersLayout.setHorizontalGroup(
-            panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelFileFiltersLayout.createSequentialGroup()
+        javax.swing.GroupLayout spFilterLayout = new javax.swing.GroupLayout(spFilter);
+        spFilter.setLayout(spFilterLayout);
+        spFilterLayout.setHorizontalGroup(
+            spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spFilterLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lableExt)
+                .addComponent(lbFilterExt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(radiobuttonAll)
-                    .addGroup(panelFileFiltersLayout.createSequentialGroup()
-                        .addComponent(radioButtonOther)
+                .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rbtnFilterAll)
+                    .addGroup(spFilterLayout.createSequentialGroup()
+                        .addComponent(rbtnFilterOther)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldExt, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtfFilterExt, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(32, 32, 32)
-                .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelFileFiltersLayout.createSequentialGroup()
-                        .addComponent(checkboxFileName)
+                .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(spFilterLayout.createSequentialGroup()
+                        .addComponent(cbFilterFilename)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldFileName))
-                    .addComponent(checkBoxHiddenFiles))
+                        .addComponent(txtfFilterFilename))
+                    .addComponent(cbFilterHidden))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separatorFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelFileFiltersLayout.createSequentialGroup()
-                        .addComponent(checkboxRegex)
+                .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(spFilterLayout.createSequentialGroup()
+                        .addComponent(cbFilterRegex)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(textfieldRegex))
+                    .addComponent(txtfFilterRegex))
                 .addContainerGap())
         );
-        panelFileFiltersLayout.setVerticalGroup(
-            panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelFileFiltersLayout.createSequentialGroup()
-                .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelFileFiltersLayout.createSequentialGroup()
-                        .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lableExt)
-                            .addComponent(radiobuttonAll)
-                            .addComponent(checkBoxHiddenFiles)
-                            .addComponent(checkboxRegex))
-                        .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(panelFileFiltersLayout.createSequentialGroup()
+        spFilterLayout.setVerticalGroup(
+            spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spFilterLayout.createSequentialGroup()
+                .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(spFilterLayout.createSequentialGroup()
+                        .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbFilterExt)
+                            .addComponent(rbtnFilterAll)
+                            .addComponent(cbFilterHidden)
+                            .addComponent(cbFilterRegex))
+                        .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(spFilterLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelFileFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(radioButtonOther)
-                                    .addComponent(textFieldExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(checkboxFileName)
-                                    .addComponent(textFieldFileName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFileFiltersLayout.createSequentialGroup()
+                                .addGroup(spFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(rbtnFilterOther)
+                                    .addComponent(txtfFilterExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbFilterFilename)
+                                    .addComponent(txtfFilterFilename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, spFilterLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(textfieldRegex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtfFilterRegex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(2, 2, 2))))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(separatorFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelCard.setLayout(new java.awt.CardLayout());
+        spcard.setLayout(new java.awt.CardLayout());
 
-        subPanelDragDrop.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-        subPanelDragDrop.setToolTipText("");
+        sspDragdrop.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        sspDragdrop.setToolTipText("");
 
-        panelDragDrop2.setForeground(new java.awt.Color(255, 255, 255));
+        ssspDragdrop2.setForeground(new java.awt.Color(255, 255, 255));
 
-        labelDropFile.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        labelDropFile.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        labelDropFile.setText("Drag&drop files here");
+        lbDragdropFiles.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lbDragdropFiles.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbDragdropFiles.setText("Drag&drop files here");
 
-        labelUploadIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/dropfilesicon.png"))); // NOI18N
+        lbDragdropUploadicon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/dropfilesicon.png"))); // NOI18N
 
-        labelOr.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        labelOr.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        labelOr.setText("or");
-        labelOr.setFocusable(false);
-        labelOr.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lbDragdropOr.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbDragdropOr.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbDragdropOr.setText("or");
+        lbDragdropOr.setFocusable(false);
+        lbDragdropOr.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         buttonBrowseFile.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         buttonBrowseFile.setForeground(new java.awt.Color(51, 153, 255));
@@ -770,86 +800,86 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout panelDragDrop2Layout = new javax.swing.GroupLayout(panelDragDrop2);
-        panelDragDrop2.setLayout(panelDragDrop2Layout);
-        panelDragDrop2Layout.setHorizontalGroup(
-            panelDragDrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelDragDrop2Layout.createSequentialGroup()
-                .addGroup(panelDragDrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelDragDrop2Layout.createSequentialGroup()
+        javax.swing.GroupLayout ssspDragdrop2Layout = new javax.swing.GroupLayout(ssspDragdrop2);
+        ssspDragdrop2.setLayout(ssspDragdrop2Layout);
+        ssspDragdrop2Layout.setHorizontalGroup(
+            ssspDragdrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ssspDragdrop2Layout.createSequentialGroup()
+                .addGroup(ssspDragdrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(ssspDragdrop2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(labelDropFile, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
-                    .addGroup(panelDragDrop2Layout.createSequentialGroup()
-                        .addGroup(panelDragDrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelDragDrop2Layout.createSequentialGroup()
+                        .addComponent(lbDragdropFiles, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+                    .addGroup(ssspDragdrop2Layout.createSequentialGroup()
+                        .addGroup(ssspDragdrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(ssspDragdrop2Layout.createSequentialGroup()
                                 .addGap(85, 85, 85)
-                                .addComponent(labelUploadIcon))
-                            .addGroup(panelDragDrop2Layout.createSequentialGroup()
+                                .addComponent(lbDragdropUploadicon))
+                            .addGroup(ssspDragdrop2Layout.createSequentialGroup()
                                 .addGap(73, 73, 73)
-                                .addComponent(labelOr, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelDragDrop2Layout.createSequentialGroup()
+                                .addComponent(lbDragdropOr, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ssspDragdrop2Layout.createSequentialGroup()
                                 .addGap(50, 50, 50)
                                 .addComponent(buttonBrowseFile)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        panelDragDrop2Layout.setVerticalGroup(
-            panelDragDrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelDragDrop2Layout.createSequentialGroup()
-                .addComponent(labelUploadIcon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        ssspDragdrop2Layout.setVerticalGroup(
+            ssspDragdrop2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ssspDragdrop2Layout.createSequentialGroup()
+                .addComponent(lbDragdropUploadicon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelDropFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbDragdropFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelOr)
+                .addComponent(lbDragdropOr)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonBrowseFile)
                 .addGap(38, 38, 38))
         );
 
-        javax.swing.GroupLayout panelDragDrop3Layout = new javax.swing.GroupLayout(panelDragDrop3);
-        panelDragDrop3.setLayout(panelDragDrop3Layout);
-        panelDragDrop3Layout.setHorizontalGroup(
-            panelDragDrop3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout sspDragdrop3Layout = new javax.swing.GroupLayout(sspDragdrop3);
+        sspDragdrop3.setLayout(sspDragdrop3Layout);
+        sspDragdrop3Layout.setHorizontalGroup(
+            sspDragdrop3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 165, Short.MAX_VALUE)
         );
-        panelDragDrop3Layout.setVerticalGroup(
-            panelDragDrop3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        sspDragdrop3Layout.setVerticalGroup(
+            sspDragdrop3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout panelDragDrop1Layout = new javax.swing.GroupLayout(panelDragDrop1);
-        panelDragDrop1.setLayout(panelDragDrop1Layout);
-        panelDragDrop1Layout.setHorizontalGroup(
-            panelDragDrop1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout sspDragdrop1Layout = new javax.swing.GroupLayout(sspDragdrop1);
+        sspDragdrop1.setLayout(sspDragdrop1Layout);
+        sspDragdrop1Layout.setHorizontalGroup(
+            sspDragdrop1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 164, Short.MAX_VALUE)
         );
-        panelDragDrop1Layout.setVerticalGroup(
-            panelDragDrop1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        sspDragdrop1Layout.setVerticalGroup(
+            sspDragdrop1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout subPanelDragDropLayout = new javax.swing.GroupLayout(subPanelDragDrop);
-        subPanelDragDrop.setLayout(subPanelDragDropLayout);
-        subPanelDragDropLayout.setHorizontalGroup(
-            subPanelDragDropLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subPanelDragDropLayout.createSequentialGroup()
-                .addComponent(panelDragDrop1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout sspDragdropLayout = new javax.swing.GroupLayout(sspDragdrop);
+        sspDragdrop.setLayout(sspDragdropLayout);
+        sspDragdropLayout.setHorizontalGroup(
+            sspDragdropLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDragdropLayout.createSequentialGroup()
+                .addComponent(sspDragdrop1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelDragDrop2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ssspDragdrop2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelDragDrop3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(sspDragdrop3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        subPanelDragDropLayout.setVerticalGroup(
-            subPanelDragDropLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelDragDrop2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelDragDrop1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelDragDrop3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        sspDragdropLayout.setVerticalGroup(
+            sspDragdropLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(ssspDragdrop2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sspDragdrop1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sspDragdrop3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        panelCard.add(subPanelDragDrop, "cardDragDrop");
+        spcard.add(sspDragdrop, "cardDragDrop");
 
-        tableFiles.setAutoCreateRowSorter(true);
-        tableFiles.setModel(new javax.swing.table.DefaultTableModel(
+        tbFileFiles.setAutoCreateRowSorter(true);
+        tbFileFiles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -872,645 +902,637 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        tableFiles.setToolTipText("");
-        tableFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tableFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tableFiles.setShowGrid(false);
-        tableFiles.setShowHorizontalLines(true);
-        tableFiles.getTableHeader().setReorderingAllowed(false);
-        subPanelFilesScroll.setViewportView(tableFiles);
-        tableFiles.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        if (tableFiles.getColumnModel().getColumnCount() > 0) {
-            tableFiles.getColumnModel().getColumn(0).setPreferredWidth(300);
-            tableFiles.getColumnModel().getColumn(1).setPreferredWidth(50);
-            tableFiles.getColumnModel().getColumn(2).setPreferredWidth(150);
-            tableFiles.getColumnModel().getColumn(3).setPreferredWidth(50);
-            tableFiles.getColumnModel().getColumn(4).setResizable(false);
-            tableFiles.getColumnModel().getColumn(4).setPreferredWidth(20);
+        tbFileFiles.setToolTipText("");
+        tbFileFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tbFileFiles.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tbFileFiles.setShowGrid(false);
+        tbFileFiles.setShowHorizontalLines(true);
+        tbFileFiles.getTableHeader().setReorderingAllowed(false);
+        sspFilesscroll.setViewportView(tbFileFiles);
+        tbFileFiles.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        if (tbFileFiles.getColumnModel().getColumnCount() > 0) {
+            tbFileFiles.getColumnModel().getColumn(0).setPreferredWidth(300);
+            tbFileFiles.getColumnModel().getColumn(1).setPreferredWidth(50);
+            tbFileFiles.getColumnModel().getColumn(2).setPreferredWidth(150);
+            tbFileFiles.getColumnModel().getColumn(3).setPreferredWidth(50);
+            tbFileFiles.getColumnModel().getColumn(4).setResizable(false);
+            tbFileFiles.getColumnModel().getColumn(4).setPreferredWidth(20);
         }
-        tableFiles.getModel().addTableModelListener(new TableModelListener() {
+        tbFileFiles.getModel().addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e){
                 updateSelectAllButton();
             }
         });
 
-        panelCard.add(subPanelFilesScroll, "cardFile");
+        spcard.add(sspFilesscroll, "cardFile");
 
-        javax.swing.GroupLayout panelFilesLayout = new javax.swing.GroupLayout(panelFiles);
-        panelFiles.setLayout(panelFilesLayout);
-        panelFilesLayout.setHorizontalGroup(
-            panelFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFilesLayout.createSequentialGroup()
+        javax.swing.GroupLayout pFilesLayout = new javax.swing.GroupLayout(pFiles);
+        pFiles.setLayout(pFilesLayout);
+        pFilesLayout.setHorizontalGroup(
+            pFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pFilesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelCard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(subPanelTool, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelFileFilters, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(spcard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(spTools, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(spFilter, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        panelFilesLayout.setVerticalGroup(
-            panelFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFilesLayout.createSequentialGroup()
-                .addComponent(subPanelTool, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pFilesLayout.setVerticalGroup(
+            pFilesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pFilesLayout.createSequentialGroup()
+                .addComponent(spTools, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelCard, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                .addComponent(spcard, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelFileFilters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(spFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        addDropDrag(panelCard);
+        addDropDrag(spcard);
 
-        subPanelDecode.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        spDecode.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        jLabel1.setText("Source Encoding");
+        lbDecodeSourceencoding.setText("Source Encoding");
 
-        comboboxSourceEncoding.setPrototypeDisplayValue("ISO-0000");
-        setComboboxEncoding(comboboxSourceEncoding, "Select...");
-        comboboxSourceEncoding.addActionListener(new java.awt.event.ActionListener() {
+        cbDecodeSourceencoding.setPrototypeDisplayValue("ISO-0000");
+        setComboboxEncoding(cbDecodeSourceencoding, "Select...");
+        cbDecodeSourceencoding.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboboxSourceEncodingActionPerformed(evt);
+                cbDecodeSourceencodingActionPerformed(evt);
             }
         });
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
+        lbDecodeArrow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
 
-        jLabel3.setText("Target Encoding");
+        lbDecodeTargetencoding.setText("Target Encoding");
 
-        comboboxTargetEncoding.setPrototypeDisplayValue("ISO-0000");
-        setComboboxEncoding(comboboxTargetEncoding, null);
-        comboboxTargetEncoding.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboboxTargetEncodingActionPerformed(evt);
-            }
-        });
-        comboboxTargetEncoding.setSelectedItem((Object) "UTF-8");
+        cbDecodeTargetencoding.setPrototypeDisplayValue("ISO-0000");
+        setComboboxEncoding(cbDecodeTargetencoding, null);
+        cbDecodeTargetencoding.setSelectedItem((Object) "UTF-8");
 
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        separatorDecode.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout sspDecode1Layout = new javax.swing.GroupLayout(sspDecode1);
+        sspDecode1.setLayout(sspDecode1Layout);
+        sspDecode1Layout.setHorizontalGroup(
+            sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDecode1Layout.createSequentialGroup()
+                .addGroup(sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspDecode1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel3))
+                        .addGroup(sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sspDecode1Layout.createSequentialGroup()
+                                .addGroup(sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lbDecodeSourceencoding)
+                                    .addComponent(lbDecodeTargetencoding))
                                 .addGap(0, 41, Short.MAX_VALUE))
-                            .addComponent(comboboxSourceEncoding, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(comboboxTargetEncoding, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(cbDecodeSourceencoding, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbDecodeTargetencoding, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(sspDecode1Layout.createSequentialGroup()
                         .addGap(33, 33, 33)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbDecodeArrow, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separatorDecode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        sspDecode1Layout.setVerticalGroup(
+            sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDecode1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator2)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                .addGroup(sspDecode1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(separatorDecode)
+                    .addGroup(sspDecode1Layout.createSequentialGroup()
+                        .addComponent(lbDecodeSourceencoding)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboboxSourceEncoding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbDecodeSourceencoding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbDecodeArrow, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
+                        .addComponent(lbDecodeTargetencoding)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(comboboxTargetEncoding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbDecodeTargetencoding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 18, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
-        buttonDecode.setFont(new java.awt.Font("맑은 고딕", 1, 24)); // NOI18N
-        buttonDecode.setText("Decode");
-        buttonDecode.addActionListener(new java.awt.event.ActionListener() {
+        btnDecodeDecode.setFont(new java.awt.Font("맑은 고딕", 1, 24)); // NOI18N
+        btnDecodeDecode.setText("Decode");
+        btnDecodeDecode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonDecodeActionPerformed(evt);
+                btnDecodeDecodeActionPerformed(evt);
             }
         });
 
-        textfieldTargetfolder.setText(System.getProperty("user.home") + "\\Desktop\\decoded_files");
-        textfieldTargetfolder.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                textfieldTargetfolderFocusLost(evt);
-            }
-        });
-        textfieldTargetfolder.addActionListener(new java.awt.event.ActionListener() {
+        txtfDecodeTargetfolder.setText(System.getProperty("user.home") + "\\Desktop\\decoded_files");
+        txtfDecodeTargetfolder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textfieldTargetfolderActionPerformed(evt);
+                txtfDecodeTargetfolderActionPerformed(evt);
             }
         });
 
-        buttonChoosetarget.setText("Choose...");
-        buttonChoosetarget.addActionListener(new java.awt.event.ActionListener() {
+        btnDecodeChoose.setText("Choose...");
+        btnDecodeChoose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonChoosetargetActionPerformed(evt);
+                btnDecodeChooseActionPerformed(evt);
             }
         });
 
-        buttongroupTargetfolder.add(radiobuttonTargetfolder);
-        radiobuttonTargetfolder.setSelected(true);
-        radiobuttonTargetfolder.setText("Create copies at");
-        radiobuttonTargetfolder.addActionListener(new java.awt.event.ActionListener() {
+        btngDecodeFolder.add(rbtnTargetfolder);
+        rbtnTargetfolder.setSelected(true);
+        rbtnTargetfolder.setText("Create copies at");
+        rbtnTargetfolder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonTargetfolderActionPerformed(evt);
+                rbtnTargetfolderActionPerformed(evt);
             }
         });
 
-        buttongroupTargetfolder.add(radiobuttonOverwriteall);
-        radiobuttonOverwriteall.setText("Overwrite all");
-        radiobuttonOverwriteall.setToolTipText("");
-        radiobuttonOverwriteall.addActionListener(new java.awt.event.ActionListener() {
+        btngDecodeFolder.add(rbtnDecodeOverwrite);
+        rbtnDecodeOverwrite.setText("Overwrite all");
+        rbtnDecodeOverwrite.setToolTipText("");
+        rbtnDecodeOverwrite.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonOverwriteallActionPerformed(evt);
+                rbtnDecodeOverwriteActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout sspDecode2Layout = new javax.swing.GroupLayout(sspDecode2);
+        sspDecode2.setLayout(sspDecode2Layout);
+        sspDecode2Layout.setHorizontalGroup(
+            sspDecode2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(sspDecode2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(textfieldTargetfolder)
+                .addGroup(sspDecode2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspDecode2Layout.createSequentialGroup()
+                        .addComponent(txtfDecodeTargetfolder)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonChoosetarget))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(radiobuttonTargetfolder)
+                        .addComponent(btnDecodeChoose))
+                    .addGroup(sspDecode2Layout.createSequentialGroup()
+                        .addComponent(rbtnTargetfolder)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radiobuttonOverwriteall)
+                        .addComponent(rbtnDecodeOverwrite)
                         .addGap(0, 171, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(sspDecode2Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(buttonDecode, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnDecodeDecode, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        sspDecode2Layout.setVerticalGroup(
+            sspDecode2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDecode2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radiobuttonTargetfolder)
-                    .addComponent(radiobuttonOverwriteall))
+                .addGroup(sspDecode2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rbtnTargetfolder)
+                    .addComponent(rbtnDecodeOverwrite))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(buttonChoosetarget)
-                    .addComponent(textfieldTargetfolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(sspDecode2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnDecodeChoose)
+                    .addComponent(txtfDecodeTargetfolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(buttonDecode, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDecodeDecode, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout subPanelDecodeLayout = new javax.swing.GroupLayout(subPanelDecode);
-        subPanelDecode.setLayout(subPanelDecodeLayout);
-        subPanelDecodeLayout.setHorizontalGroup(
-            subPanelDecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subPanelDecodeLayout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        javax.swing.GroupLayout spDecodeLayout = new javax.swing.GroupLayout(spDecode);
+        spDecode.setLayout(spDecodeLayout);
+        spDecodeLayout.setHorizontalGroup(
+            spDecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spDecodeLayout.createSequentialGroup()
+                .addComponent(sspDecode1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(sspDecode2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        subPanelDecodeLayout.setVerticalGroup(
-            subPanelDecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        spDecodeLayout.setVerticalGroup(
+            spDecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(sspDecode1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sspDecode2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tabbedPane.addTab("Decode", subPanelDecode);
+        tabbedPane.addTab("Decode", spDecode);
 
-        subPanelDetectEncoding.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        spDetect.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        buttonSelectEncoding.setText("Select Encodings:");
-        buttonSelectEncoding.setEnabled(false);
-        buttonSelectEncoding.addActionListener(new java.awt.event.ActionListener() {
+        btnDetectSelectencoding.setText("Select Encodings:");
+        btnDetectSelectencoding.setEnabled(false);
+        btnDetectSelectencoding.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSelectEncodingActionPerformed(evt);
+                btnDetectSelectencodingActionPerformed(evt);
             }
         });
 
-        jButton5.setText("Help");
+        btnDetectHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/HelpButtonIcon.png"))); // NOI18N
+        btnDetectHelp.setToolTipText("<html>It is impossible to know the exact type of encoding used to create a document unless explicitly being told. \n<br>Select automatic detection for possible character encoding of the sample file. If failed to detect encoding,\n<br> select brute force and test sample with multiple encodings to see which is the correct one.");
+        btnDetectHelp.setBorder(null);
+        btnDetectHelp.setBorderPainted(false);
+        btnDetectHelp.setContentAreaFilled(false);
 
-        buttonChoosesample.setText("Choose File:");
-        buttonChoosesample.setEnabled(false);
-        buttonChoosesample.addActionListener(new java.awt.event.ActionListener() {
+        btnDetectChoosefile.setText("Choose File:");
+        btnDetectChoosefile.setEnabled(false);
+        btnDetectChoosefile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonChoosesampleActionPerformed(evt);
+                btnDetectChoosefileActionPerformed(evt);
             }
         });
 
-        labelSamplefile.setEnabled(false);
+        lbDetectSample.setEnabled(false);
 
-        buttongroupDetectencoding.add(radioAuto);
-        radioAuto.setText("Automatic");
-        radioAuto.addActionListener(new java.awt.event.ActionListener() {
+        btngDetect.add(rbtnDetectAuto);
+        rbtnDetectAuto.setText("Automatic");
+        rbtnDetectAuto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioAutoActionPerformed(evt);
+                rbtnDetectAutoActionPerformed(evt);
             }
         });
 
-        buttongroupDetectencoding.add(radioBrute);
-        radioBrute.setText("Brute force");
-        radioBrute.addActionListener(new java.awt.event.ActionListener() {
+        btngDetect.add(rbtnDetectBrute);
+        rbtnDetectBrute.setText("Brute force");
+        rbtnDetectBrute.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioBruteActionPerformed(evt);
+                rbtnDetectBruteActionPerformed(evt);
             }
         });
 
-        buttonDetectencoding.setFont(new java.awt.Font("맑은 고딕", 1, 24)); // NOI18N
-        buttonDetectencoding.setText("Test");
-        buttonDetectencoding.setEnabled(false);
-        buttonDetectencoding.addActionListener(new java.awt.event.ActionListener() {
+        btnDetectDetect.setFont(new java.awt.Font("맑은 고딕", 1, 24)); // NOI18N
+        btnDetectDetect.setText("Test");
+        btnDetectDetect.setEnabled(false);
+        btnDetectDetect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonDetectencodingActionPerformed(evt);
+                btnDetectDetectActionPerformed(evt);
             }
         });
 
-        labelSamplesize.setText("Sample size:");
-        labelSamplesize.setEnabled(false);
+        lbDetectSamplesize.setText("Sample size:");
+        lbDetectSamplesize.setEnabled(false);
 
-        labelChoosesample.setText("Choose test sample:");
-        labelChoosesample.setEnabled(false);
+        lbDetectChoosesample.setText("Choose test sample:");
+        lbDetectChoosesample.setEnabled(false);
 
-        textfieldSamplesize.setText("100");
-        textfieldSamplesize.setEnabled(false);
+        txtfDetectSamplesize.setText("100");
+        txtfDetectSamplesize.setEnabled(false);
 
-        textareaSelectedencodings.setColumns(10);
-        textareaSelectedencodings.setRows(5);
-        textareaSelectedencodings.setEnabled(false);
-        jScrollPane6.setViewportView(textareaSelectedencodings);
+        txtareaDetectSelectedencodings.setColumns(10);
+        txtareaDetectSelectedencodings.setRows(5);
+        txtareaDetectSelectedencodings.setEnabled(false);
+        jScrollPane6.setViewportView(txtareaDetectSelectedencodings);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout sspDetectLayout = new javax.swing.GroupLayout(sspDetect);
+        sspDetect.setLayout(sspDetectLayout);
+        sspDetectLayout.setHorizontalGroup(
+            sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDetectLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator3)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(buttonSelectEncoding)
+                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(separatorDetect)
+                    .addGroup(sspDetectLayout.createSequentialGroup()
+                        .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sspDetectLayout.createSequentialGroup()
+                                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnDetectSelectencoding)
                                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                        .addGap(44, 44, 44)
-                                        .addComponent(labelChoosesample))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                        .addGap(44, 44, 44)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(buttonChoosesample)
-                                            .addComponent(labelSamplesize))
+                                .addGap(44, 44, 44)
+                                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lbDetectChoosesample, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sspDetectLayout.createSequentialGroup()
+                                        .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(btnDetectChoosefile)
+                                            .addComponent(lbDetectSamplesize))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                                .addComponent(textfieldSamplesize, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sspDetectLayout.createSequentialGroup()
+                                                .addComponent(txtfDetectSamplesize, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(buttonDetectencoding, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(labelSamplefile, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(radioAuto, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnDetectDetect, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(lbDetectSample, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addGroup(sspDetectLayout.createSequentialGroup()
+                                .addComponent(rbtnDetectAuto, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioBrute, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(rbtnDetectBrute, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnDetectHelp)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        sspDetectLayout.setVerticalGroup(
+            sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspDetectLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioAuto)
-                    .addComponent(radioBrute)
-                    .addComponent(jButton5))
+                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rbtnDetectAuto)
+                    .addComponent(rbtnDetectBrute)
+                    .addComponent(btnDetectHelp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separatorDetect, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(labelChoosesample)
+                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspDetectLayout.createSequentialGroup()
+                        .addComponent(lbDetectChoosesample)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(buttonChoosesample)
-                            .addComponent(labelSamplefile))
+                        .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnDetectChoosefile)
+                            .addComponent(lbDetectSample))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(labelSamplesize)
-                                    .addComponent(textfieldSamplesize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sspDetectLayout.createSequentialGroup()
+                                .addGroup(sspDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lbDetectSamplesize)
+                                    .addComponent(txtfDetectSamplesize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(24, 24, 24))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(buttonDetectencoding, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sspDetectLayout.createSequentialGroup()
+                                .addComponent(btnDetectDetect, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(buttonSelectEncoding)
+                    .addGroup(sspDetectLayout.createSequentialGroup()
+                        .addComponent(btnDetectSelectencoding)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
-        javax.swing.GroupLayout subPanelDetectEncodingLayout = new javax.swing.GroupLayout(subPanelDetectEncoding);
-        subPanelDetectEncoding.setLayout(subPanelDetectEncodingLayout);
-        subPanelDetectEncodingLayout.setHorizontalGroup(
-            subPanelDetectEncodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout spDetectLayout = new javax.swing.GroupLayout(spDetect);
+        spDetect.setLayout(spDetectLayout);
+        spDetectLayout.setHorizontalGroup(
+            spDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(sspDetect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        subPanelDetectEncodingLayout.setVerticalGroup(
-            subPanelDetectEncodingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        spDetectLayout.setVerticalGroup(
+            spDetectLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(sspDetect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tabbedPane.addTab("Detect Encoding", subPanelDetectEncoding);
+        tabbedPane.addTab("Detect Encoding", spDetect);
 
-        subPanelFileHandling.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        spHd.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel12.setText("Change files extensions");
+        lbhdExtExt.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbhdExtExt.setText("Change files extensions");
 
-        buttongroupFileext.add(jRadioButton7);
-        jRadioButton7.setSelected(true);
-        jRadioButton7.setText("All");
+        btngHdExt.add(rbtnHdExtAll);
+        rbtnHdExtAll.setSelected(true);
+        rbtnHdExtAll.setText("All");
 
-        buttongroupFileext.add(radiobuttonOtherChangeExt);
-        radiobuttonOtherChangeExt.setText("Other:");
-        radiobuttonOtherChangeExt.addActionListener(new java.awt.event.ActionListener() {
+        btngHdExt.add(rbtnHdExtOther);
+        rbtnHdExtOther.setText("Other:");
+        rbtnHdExtOther.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonOtherChangeExtActionPerformed(evt);
+                rbtnHdExtOtherActionPerformed(evt);
             }
         });
 
-        textfieldChangeext.addActionListener(new java.awt.event.ActionListener() {
+        txtfHdExtOther.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textfieldChangeextActionPerformed(evt);
+                txtfHdExtOtherActionPerformed(evt);
             }
         });
 
-        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
+        lbHdExtArrow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
 
-        jLabel14.setText("target:");
+        lbHdExtTarget.setText("target:");
 
-        buttonChangeFileExt.setText("Change");
-        buttonChangeFileExt.addActionListener(new java.awt.event.ActionListener() {
+        btnHdExtChange.setText("Change");
+        btnHdExtChange.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonChangeFileExtActionPerformed(evt);
+                btnHdExtChangeActionPerformed(evt);
             }
         });
 
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        separatorHdExt.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout sspHdExtLayout = new javax.swing.GroupLayout(sspHdExt);
+        sspHdExt.setLayout(sspHdExtLayout);
+        sspHdExtLayout.setHorizontalGroup(
+            sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdExtLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel12)
-                            .addComponent(jRadioButton7)
-                            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel7Layout.createSequentialGroup()
+                .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspHdExtLayout.createSequentialGroup()
+                        .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbHdExtArrow, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbhdExtExt)
+                            .addComponent(rbtnHdExtAll)
+                            .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sspHdExtLayout.createSequentialGroup()
                                     .addGap(23, 23, 23)
-                                    .addComponent(jLabel14)
+                                    .addComponent(lbHdExtTarget)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(textfieldTargetChangeExt, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel7Layout.createSequentialGroup()
-                                    .addComponent(radiobuttonOtherChangeExt)
+                                    .addComponent(txtfHdExtTarget, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sspHdExtLayout.createSequentialGroup()
+                                    .addComponent(rbtnHdExtOther)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(textfieldChangeext, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(txtfHdExtOther, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(28, 28, 28))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                        .addComponent(buttonChangeFileExt)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sspHdExtLayout.createSequentialGroup()
+                        .addComponent(btnHdExtChange)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separatorHdExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        sspHdExtLayout.setVerticalGroup(
+            sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdExtLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator4)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jLabel12)
+                .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(separatorHdExt)
+                    .addGroup(sspHdExtLayout.createSequentialGroup()
+                        .addComponent(lbhdExtExt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jRadioButton7)
+                        .addComponent(rbtnHdExtAll)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(radiobuttonOtherChangeExt)
-                            .addComponent(textfieldChangeext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(rbtnHdExtOther)
+                            .addComponent(txtfHdExtOther, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbHdExtArrow, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel14)
-                            .addComponent(textfieldTargetChangeExt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(sspHdExtLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbHdExtTarget)
+                            .addComponent(txtfHdExtTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonChangeFileExt)))
+                        .addComponent(btnHdExtChange)))
                 .addContainerGap())
         );
 
-        jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel15.setText("Rename files");
+        lbHdRename.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbHdRename.setText("Rename files");
 
-        buttongroupRemanefiles.add(radiobuttonRenameall);
-        radiobuttonRenameall.setText("Rename all");
-        radiobuttonRenameall.addActionListener(new java.awt.event.ActionListener() {
+        btngHdRename.add(rbtnHdRenameall);
+        rbtnHdRenameall.setText("Rename all");
+        rbtnHdRenameall.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonRenameallActionPerformed(evt);
+                rbtnHdRenameallActionPerformed(evt);
             }
         });
 
-        buttongroupRemanefiles.add(radiobuttonReplace);
-        radiobuttonReplace.setSelected(true);
-        radiobuttonReplace.setText("Replace:");
-        radiobuttonReplace.addActionListener(new java.awt.event.ActionListener() {
+        btngHdRename.add(rbtnHdReplace);
+        rbtnHdReplace.setSelected(true);
+        rbtnHdReplace.setText("Replace:");
+        rbtnHdReplace.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radiobuttonReplaceActionPerformed(evt);
+                rbtnHdReplaceActionPerformed(evt);
             }
         });
 
-        jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
+        lbHdRenameArrow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/downarrow.png"))); // NOI18N
 
-        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        separatorHdRename.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jButton12.setText("Rename");
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
+        btnHdRenameRename.setText("Rename");
+        btnHdRenameRename.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
+                btnHdRenameRenameActionPerformed(evt);
             }
         });
 
-        jLabel17.setText("With:");
+        lbHdRenameTarget.setText("With:");
 
-        checkboxRenameregex.setText("Regex?");
+        cbHdRenameRegex.setText("Regex?");
 
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(radiobuttonReplace)
+        javax.swing.GroupLayout sspHdrenameLayout = new javax.swing.GroupLayout(sspHdrename);
+        sspHdrename.setLayout(sspHdrenameLayout);
+        sspHdrenameLayout.setHorizontalGroup(
+            sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdrenameLayout.createSequentialGroup()
+                .addGroup(sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
+                        .addComponent(rbtnHdReplace)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textfieldRenamereplace))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(txtfRenameReplace))
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
                         .addGap(33, 33, 33)
-                        .addComponent(jLabel17)
+                        .addComponent(lbHdRenameTarget)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textfieldRenametarget))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(txtfHdRenameTarget))
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
                         .addGap(89, 89, 89)
-                        .addComponent(jButton12))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(checkboxRenameregex)
+                        .addComponent(btnHdRenameRename))
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
+                        .addComponent(cbHdRenameRegex)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel16))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(lbHdRenameArrow))
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel15))
-                    .addComponent(radiobuttonRenameall))
+                        .addComponent(lbHdRename))
+                    .addComponent(rbtnHdRenameall))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separatorHdRename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
+        sspHdrenameLayout.setVerticalGroup(
+            sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdrenameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jLabel15)
+                .addGroup(sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspHdrenameLayout.createSequentialGroup()
+                        .addComponent(lbHdRename)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radiobuttonRenameall)
+                        .addComponent(rbtnHdRenameall)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(radiobuttonReplace)
-                            .addComponent(textfieldRenamereplace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(rbtnHdReplace)
+                            .addComponent(txtfRenameReplace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(checkboxRenameregex))
+                        .addGroup(sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbHdRenameArrow, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbHdRenameRegex))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(textfieldRenametarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel17))
+                        .addGroup(sspHdrenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtfHdRenameTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbHdRenameTarget))
                         .addGap(15, 15, 15)
-                        .addComponent(jButton12))
-                    .addComponent(jSeparator5))
+                        .addComponent(btnHdRenameRename))
+                    .addComponent(separatorHdRename))
                 .addContainerGap())
         );
 
-        jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel18.setText("Search file content");
+        lbHdSearch.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbHdSearch.setText("Search file content");
 
-        jButton14.setText("Search");
-        jButton14.addActionListener(new java.awt.event.ActionListener() {
+        btnHdSearchSearch.setText("Search");
+        btnHdSearchSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton14ActionPerformed(evt);
+                btnHdSearchSearchActionPerformed(evt);
             }
         });
 
-        jLabel19.setText("Search by:");
+        lbHdSearchSearchby.setText("Search by:");
 
-        buttongroupSearchfilecontent.add(jRadioButton11);
-        jRadioButton11.setSelected(true);
-        jRadioButton11.setText("Text");
+        btngHdSearch.add(rbtnHdSearchText);
+        rbtnHdSearchText.setSelected(true);
+        rbtnHdSearchText.setText("Text");
 
-        buttongroupSearchfilecontent.add(radiofilesearchregex);
-        radiofilesearchregex.setText("Regex");
+        btngHdSearch.add(rbtnHdSearchRegex);
+        rbtnHdSearchRegex.setText("Regex");
 
-        textareaSearchfilecontent.setColumns(10);
-        textareaSearchfilecontent.setLineWrap(true);
-        textareaSearchfilecontent.setRows(2);
-        textareaSearchfilecontent.setTabSize(3);
-        textareaSearchfilecontent.setWrapStyleWord(true);
-        jScrollPane5.setViewportView(textareaSearchfilecontent);
+        txtareaHdSearch.setColumns(10);
+        txtareaHdSearch.setLineWrap(true);
+        txtareaHdSearch.setRows(2);
+        txtareaHdSearch.setTabSize(3);
+        txtareaHdSearch.setWrapStyleWord(true);
+        jScrollPane5.setViewportView(txtareaHdSearch);
 
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
+        javax.swing.GroupLayout sspHdSearchLayout = new javax.swing.GroupLayout(sspHdSearch);
+        sspHdSearch.setLayout(sspHdSearchLayout);
+        sspHdSearchLayout.setHorizontalGroup(
+            sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdSearchLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addComponent(jLabel19)
+                .addGroup(sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sspHdSearchLayout.createSequentialGroup()
+                        .addComponent(lbHdSearchSearchby)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addComponent(radiofilesearchregex)
+                        .addGroup(sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sspHdSearchLayout.createSequentialGroup()
+                                .addComponent(rbtnHdSearchRegex)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jRadioButton11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+                            .addComponent(rbtnHdSearchText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sspHdSearchLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton14))
-                    .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel18)
+                        .addComponent(btnHdSearchSearch))
+                    .addGroup(sspHdSearchLayout.createSequentialGroup()
+                        .addGroup(sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbHdSearch)
                             .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE))
                         .addGap(11, 11, 11)))
                 .addContainerGap())
         );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
+        sspHdSearchLayout.setVerticalGroup(
+            sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sspHdSearchLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel18)
+                .addComponent(lbHdSearch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel19)
-                    .addComponent(jRadioButton11))
+                .addGroup(sspHdSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbHdSearchSearchby)
+                    .addComponent(rbtnHdSearchText))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radiofilesearchregex)
+                .addComponent(rbtnHdSearchRegex)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane5)
                 .addGap(12, 12, 12)
-                .addComponent(jButton14)
+                .addComponent(btnHdSearchSearch)
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout subPanelFileHandlingLayout = new javax.swing.GroupLayout(subPanelFileHandling);
-        subPanelFileHandling.setLayout(subPanelFileHandlingLayout);
-        subPanelFileHandlingLayout.setHorizontalGroup(
-            subPanelFileHandlingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(subPanelFileHandlingLayout.createSequentialGroup()
-                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout spHdLayout = new javax.swing.GroupLayout(spHd);
+        spHd.setLayout(spHdLayout);
+        spHdLayout.setHorizontalGroup(
+            spHdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(spHdLayout.createSequentialGroup()
+                .addComponent(sspHdExt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(sspHdrename, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sspHdSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        subPanelFileHandlingLayout.setVerticalGroup(
-            subPanelFileHandlingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        spHdLayout.setVerticalGroup(
+            spHdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(sspHdExt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sspHdSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sspHdrename, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        tabbedPane.addTab("File Handling", subPanelFileHandling);
+        tabbedPane.addTab("File Handling", spHd);
 
         javax.swing.GroupLayout panelFunctionsLayout = new javax.swing.GroupLayout(panelFunctions);
         panelFunctions.setLayout(panelFunctionsLayout);
@@ -1535,6 +1557,15 @@ public class MainFrame extends javax.swing.JFrame {
         menuBar.add(menuEdit);
 
         jMenu1.setText("Help");
+
+        jMenuItem2.setText("About");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
         menuBar.add(jMenu1);
 
         setJMenuBar(menuBar);
@@ -1547,14 +1578,14 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(panelFunctions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelFunctions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(20, 20, 20))
@@ -1565,113 +1596,106 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     
     
-    
-    
     // <editor-fold defaultstate="collapsed" desc="Listeners">
     
-    private void buttonOFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOFActionPerformed
+    private void btnFileOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFileOpenActionPerformed
         addFiles(getFilesFromFilechooser(true, JFileChooser.FILES_AND_DIRECTORIES));
-    }//GEN-LAST:event_buttonOFActionPerformed
+    }//GEN-LAST:event_btnFileOpenActionPerformed
     
-    private void buttonRemoveAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveAllActionPerformed
+    private void btnFileRemoveallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFileRemoveallActionPerformed
         removeFiles(fileSelect.getFiles()); 
-    }//GEN-LAST:event_buttonRemoveAllActionPerformed
+    }//GEN-LAST:event_btnFileRemoveallActionPerformed
 
-    private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
+    private void btnFileRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFileRemoveActionPerformed
         removeSelectedRows();
-    }//GEN-LAST:event_buttonRemoveActionPerformed
+    }//GEN-LAST:event_btnFileRemoveActionPerformed
 
     private void buttonBrowseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonBrowseFileActionPerformed
         addFiles(getFilesFromFilechooser(true, JFileChooser.FILES_AND_DIRECTORIES));
     }//GEN-LAST:event_buttonBrowseFileActionPerformed
 
-    private void textFieldExtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldExtActionPerformed
-        radioButtonOther.requestFocus();
-        radioButtonOther.setSelected(true);
-        fileSelect.setFilterExt(textFieldExt.getText());
+    private void txtfFilterExtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfFilterExtActionPerformed
+        rbtnFilterOther.requestFocus();
+        rbtnFilterOther.setSelected(true);
+        fileSelect.setFilterExt(txtfFilterExt.getText());
         updateTable();
-    }//GEN-LAST:event_textFieldExtActionPerformed
+    }//GEN-LAST:event_txtfFilterExtActionPerformed
 
-    private void checkboxRegexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxRegexActionPerformed
-        if(checkboxRegex.isSelected()) {
-            textfieldRegex.requestFocus();
-            fileSelect.setFilterRegex(textfieldRegex.getText());
+    private void cbFilterRegexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbFilterRegexActionPerformed
+        if(cbFilterRegex.isSelected()) {
+            txtfFilterRegex.requestFocus();
+            fileSelect.setFilterRegex(txtfFilterRegex.getText());
         } else {
             fileSelect.setFilterRegex(".*");
         }
         updateTable();
-    }//GEN-LAST:event_checkboxRegexActionPerformed
+    }//GEN-LAST:event_cbFilterRegexActionPerformed
 
-    private void comboboxTargetEncodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboboxTargetEncodingActionPerformed
-        fileDecoder.setTargetCharset(Charset.forName((String)comboboxTargetEncoding.getSelectedItem()));
-    }//GEN-LAST:event_comboboxTargetEncodingActionPerformed
-
-    private void buttonDecodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDecodeActionPerformed
+    private void btnDecodeDecodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDecodeDecodeActionPerformed
         setDecodeButton();
-    }//GEN-LAST:event_buttonDecodeActionPerformed
+    }//GEN-LAST:event_btnDecodeDecodeActionPerformed
 
-    private void buttonSelectEncodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectEncodingActionPerformed
-        dialogSelectEncoding.setVisible(true);
-    }//GEN-LAST:event_buttonSelectEncodingActionPerformed
+    private void btnDetectSelectencodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetectSelectencodingActionPerformed
+        dgSelectencoding.setVisible(true);
+    }//GEN-LAST:event_btnDetectSelectencodingActionPerformed
 
-    private void buttonDetectencodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDetectencodingActionPerformed
+    private void btnDetectDetectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetectDetectActionPerformed
         setDetectencodingButton();
-    }//GEN-LAST:event_buttonDetectencodingActionPerformed
+    }//GEN-LAST:event_btnDetectDetectActionPerformed
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        dialogBrute.setVisible(false);
-    }//GEN-LAST:event_jButton13ActionPerformed
+    private void btnBruteOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBruteOkActionPerformed
+        dgBrute.setVisible(false);
+    }//GEN-LAST:event_btnBruteOkActionPerformed
 
-    private void comboboxSourceEncodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboboxSourceEncodingActionPerformed
-        comboboxSourceEncoding.removeItemAt(0);
-        fileDecoder.setSourceCharset(Charset.forName((String)comboboxSourceEncoding.getSelectedItem()));
-    }//GEN-LAST:event_comboboxSourceEncodingActionPerformed
+    private void cbDecodeSourceencodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbDecodeSourceencodingActionPerformed
+        cbDecodeSourceencoding.removeItemAt(0);
+    }//GEN-LAST:event_cbDecodeSourceencodingActionPerformed
 
-    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-        dialogSearchResult.setVisible(false);
-        DefaultTableModel model = (DefaultTableModel) tableFiles1.getModel();
+    private void btnSearchCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+        dgSearch.setVisible(false);
+        DefaultTableModel model = (DefaultTableModel) tbSearchFiles.getModel();
         while(model.getRowCount()>0) {
             model.removeRow(0);
         }
-    }//GEN-LAST:event_jButton15ActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
-    private void buttonSelectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectAllActionPerformed
+    private void cbFileSelectallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbFileSelectallActionPerformed
         boolean b = !IsSelectedAll();
-        for(int i = 0; i < tableFiles.getRowCount(); i++){
-            tableFiles.setValueAt(b, i , 4);
+        for(int i = 0; i < tbFileFiles.getRowCount(); i++){
+            tbFileFiles.setValueAt(b, i , 4);
         }
-    }//GEN-LAST:event_buttonSelectAllActionPerformed
+    }//GEN-LAST:event_cbFileSelectallActionPerformed
 
-    private void radiobuttonAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonAllActionPerformed
+    private void rbtnFilterAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnFilterAllActionPerformed
         fileSelect.setFilterExt("");
         updateTable();
-    }//GEN-LAST:event_radiobuttonAllActionPerformed
+    }//GEN-LAST:event_rbtnFilterAllActionPerformed
 
-    private void radioButtonOtherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonOtherActionPerformed
-        textFieldExt.requestFocus();
-        fileSelect.setFilterExt(textFieldExt.getText());
+    private void rbtnFilterOtherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnFilterOtherActionPerformed
+        txtfFilterExt.requestFocus();
+        fileSelect.setFilterExt(txtfFilterExt.getText());
         updateTable();
-    }//GEN-LAST:event_radioButtonOtherActionPerformed
+    }//GEN-LAST:event_rbtnFilterOtherActionPerformed
 
-    private void textFieldExtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldExtFocusGained
-        textFieldExt.selectAll();
-    }//GEN-LAST:event_textFieldExtFocusGained
+    private void txtfFilterExtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtfFilterExtFocusGained
+        txtfFilterExt.selectAll();
+    }//GEN-LAST:event_txtfFilterExtFocusGained
 
-    private void checkBoxHiddenFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxHiddenFilesActionPerformed
-        boolean hidden = checkBoxHiddenFiles.isSelected();
+    private void cbFilterHiddenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbFilterHiddenActionPerformed
+        boolean hidden = cbFilterHidden.isSelected();
         fileSelect.setFilterHidden(hidden);
         updateTable();
-    }//GEN-LAST:event_checkBoxHiddenFilesActionPerformed
+    }//GEN-LAST:event_cbFilterHiddenActionPerformed
 
-    private void checkboxFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxFileNameActionPerformed
-        textFieldFileName.requestFocus();
-        String text = checkboxFileName.isSelected() ? textFieldFileName.getText() : "";
+    private void cbFilterFilenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbFilterFilenameActionPerformed
+        txtfFilterFilename.requestFocus();
+        String text = cbFilterFilename.isSelected() ? txtfFilterFilename.getText() : "";
         fileSelect.setFilterName(text);
         updateTable();
-    }//GEN-LAST:event_checkboxFileNameActionPerformed
+    }//GEN-LAST:event_cbFilterFilenameActionPerformed
 
-    private void textFieldFileNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldFileNameFocusGained
-        textFieldFileName.getDocument().addDocumentListener(new DocumentListener() {
+    private void txtfFilterFilenameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtfFilterFilenameFocusGained
+        txtfFilterFilename.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -1687,162 +1711,148 @@ public class MainFrame extends javax.swing.JFrame {
                 update();
             }
             private void update() {
-                if(checkboxFileName.isSelected()){
-                    fileSelect.setFilterName(textFieldFileName.getText());
+                if(cbFilterFilename.isSelected()){
+                    fileSelect.setFilterName(txtfFilterFilename.getText());
                 updateTable();
                 }
             }
         });
-    }//GEN-LAST:event_textFieldFileNameFocusGained
+    }//GEN-LAST:event_txtfFilterFilenameFocusGained
 
-    private void textFieldFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldFileNameActionPerformed
-        checkboxFileName.requestFocus();
-        checkboxFileName.setSelected(true);
-    }//GEN-LAST:event_textFieldFileNameActionPerformed
+    private void txtfFilterFilenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfFilterFilenameActionPerformed
+        cbFilterFilename.requestFocus();
+        cbFilterFilename.setSelected(true);
+    }//GEN-LAST:event_txtfFilterFilenameActionPerformed
 
-    private void textfieldRegexFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textfieldRegexFocusGained
-        textfieldRegex.selectAll();
-    }//GEN-LAST:event_textfieldRegexFocusGained
+    private void txtfFilterRegexFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtfFilterRegexFocusGained
+        txtfFilterRegex.selectAll();
+    }//GEN-LAST:event_txtfFilterRegexFocusGained
 
-    private void textfieldRegexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textfieldRegexActionPerformed
-        checkboxRegex.setSelected(true);
-        checkboxRegex.requestFocus();
-        fileSelect.setFilterRegex(textfieldRegex.getText());
+    private void txtfFilterRegexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfFilterRegexActionPerformed
+        cbFilterRegex.setSelected(true);
+        cbFilterRegex.requestFocus();
+        fileSelect.setFilterRegex(txtfFilterRegex.getText());
         updateTable();
-    }//GEN-LAST:event_textfieldRegexActionPerformed
+    }//GEN-LAST:event_txtfFilterRegexActionPerformed
 
-    private void radiobuttonOverwriteallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonOverwriteallActionPerformed
-        if(!radiobuttonOverwriteall.isSelected()) {
-            fileDecoder.setOverwrite(false);
+    private void rbtnDecodeOverwriteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnDecodeOverwriteActionPerformed
+        if(!rbtnDecodeOverwrite.isSelected()) {
             return;
         }
-        if(!textfieldTargetfolder.isEnabled()) return;
+        if(!txtfDecodeTargetfolder.isEnabled()) return;
         String msg = "Decoded files will overwrite original files.\nIf wrong encoding is selected, files\nmay be irreversibly damaged. Confirm?";
         int input = JOptionPane.showConfirmDialog(null, msg, "Overwrite", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         if(input == JOptionPane.OK_OPTION) {
-            fileDecoder.setOverwrite(true);
-            textfieldTargetfolder.setEnabled(false);
-            buttonChoosetarget.setEnabled(false);
+            txtfDecodeTargetfolder.setEnabled(false);
+            btnDecodeChoose.setEnabled(false);
         } else {
-            radiobuttonOverwriteall.setSelected(false);
-            radiobuttonTargetfolder.setSelected(true);
+            rbtnDecodeOverwrite.setSelected(false);
+            rbtnTargetfolder.setSelected(true);
         }
-    }//GEN-LAST:event_radiobuttonOverwriteallActionPerformed
+    }//GEN-LAST:event_rbtnDecodeOverwriteActionPerformed
 
-    private void textfieldTargetfolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textfieldTargetfolderActionPerformed
-        radiobuttonTargetfolder.requestFocus();
-    }//GEN-LAST:event_textfieldTargetfolderActionPerformed
+    private void txtfDecodeTargetfolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfDecodeTargetfolderActionPerformed
+        rbtnTargetfolder.requestFocus();
+    }//GEN-LAST:event_txtfDecodeTargetfolderActionPerformed
 
-    private void radiobuttonTargetfolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonTargetfolderActionPerformed
-        textfieldTargetfolder.setEnabled(true);
-        buttonChoosetarget.setEnabled(true);
-        fileDecoder.setTargetFolder(new File(textfieldTargetfolder.getText()));
-    }//GEN-LAST:event_radiobuttonTargetfolderActionPerformed
+    private void rbtnTargetfolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnTargetfolderActionPerformed
+        txtfDecodeTargetfolder.setEnabled(true);
+        btnDecodeChoose.setEnabled(true);
+    }//GEN-LAST:event_rbtnTargetfolderActionPerformed
 
-    private void textfieldTargetfolderFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textfieldTargetfolderFocusLost
-        fileDecoder.setTargetFolder(new File(textfieldTargetfolder.getText()));
-    }//GEN-LAST:event_textfieldTargetfolderFocusLost
-
-    private void buttonChoosetargetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChoosetargetActionPerformed
-        fileChooser.setCurrentDirectory(new File(textfieldTargetfolder.getText()));
+    private void btnDecodeChooseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDecodeChooseActionPerformed
+        fileChooser.setCurrentDirectory(new File(txtfDecodeTargetfolder.getText()));
         for(File f : getFilesFromFilechooser(false, JFileChooser.DIRECTORIES_ONLY)) {
-            textfieldTargetfolder.setText(f.getAbsolutePath());
-            fileDecoder.setTargetFolder(f);
+            txtfDecodeTargetfolder.setText(f.getAbsolutePath());
         }
-    }//GEN-LAST:event_buttonChoosetargetActionPerformed
+    }//GEN-LAST:event_btnDecodeChooseActionPerformed
 
-    private void radioAutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioAutoActionPerformed
+    private void rbtnDetectAutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnDetectAutoActionPerformed
         enableDetectencoding(true);
-        fileDetector.setBruteforce(false);
-    }//GEN-LAST:event_radioAutoActionPerformed
+    }//GEN-LAST:event_rbtnDetectAutoActionPerformed
 
-    private void radioBruteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBruteActionPerformed
+    private void rbtnDetectBruteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnDetectBruteActionPerformed
        enableDetectencoding(true);
-       fileDetector.setBruteforce(true);
-    }//GEN-LAST:event_radioBruteActionPerformed
+    }//GEN-LAST:event_rbtnDetectBruteActionPerformed
 
-    private void buttonChoosesampleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChoosesampleActionPerformed
-        fileChooser.setCurrentDirectory(fileDetector.getSampleFile());
+    private void btnDetectChoosefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetectChoosefileActionPerformed
+        if(!lbDetectSample.getText().isBlank()) {
+            fileChooser.setCurrentDirectory(new File(lbDetectSample.getText().strip()));
+        }
         for(File f : getFilesFromFilechooser(false, JFileChooser.FILES_ONLY)){
-            labelSamplefile.setText(f.getAbsolutePath());
-            fileDetector.setSampleFile(f);
+            lbDetectSample.setText(f.getAbsolutePath());
         }
-    }//GEN-LAST:event_buttonChoosesampleActionPerformed
+    }//GEN-LAST:event_btnDetectChoosefileActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void btnSelectencodingOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectencodingOkActionPerformed
         HashSet<Charset> cs = new HashSet<>();
-        for(int i =0; i < tableEncoding.getRowCount(); i++) {
-            if((boolean)tableEncoding.getValueAt(i, 1)) cs.add(Charset.forName((String)tableEncoding.getValueAt(i, 0)));
+        for(int i =0; i < tbSelectencoding.getRowCount(); i++) {
+            if((boolean)tbSelectencoding.getValueAt(i, 1)) cs.add(Charset.forName((String)tbSelectencoding.getValueAt(i, 0)));
         }
-        if(cs.size()>10&&!fileDetector.isBruteforce()) {
+        if(cs.size()>10&&rbtnDetectBrute.isSelected()) {
             String msg = "For auto-detection, it is recommended that you select less than 10 encodings. Confirm?";
             int input = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
             if(input == JOptionPane.CANCEL_OPTION) return;
         }
-        fileDetector.setCharsetsToBeTested(cs);
         String str = "";
-        for(Charset c : fileDetector.getCharsetsToBeTested()) {
+        for(Charset c : cs) {
             str += c.displayName() + "\n";
         }
-        textareaSelectedencodings.setText(str);
-        dialogSelectEncoding.setVisible(false);
-    }//GEN-LAST:event_jButton3ActionPerformed
+        txtareaDetectSelectedencodings.setText(str);
+        dgSelectencoding.setVisible(false);
+    }//GEN-LAST:event_btnSelectencodingOkActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        dialogSelectEncoding.setVisible(false);
-    }//GEN-LAST:event_jButton4ActionPerformed
+    private void btnSelectencodingCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectencodingCancelActionPerformed
+        dgSelectencoding.setVisible(false);
+    }//GEN-LAST:event_btnSelectencodingCancelActionPerformed
 
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        dialogAuto.setVisible(false);
-    }//GEN-LAST:event_jButton11ActionPerformed
+    private void btnAutoOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutoOkActionPerformed
+        dgAuto.setVisible(false);
+    }//GEN-LAST:event_btnAutoOkActionPerformed
 
-    private void radiobuttonOtherChangeExtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonOtherChangeExtActionPerformed
-        textfieldChangeext.requestFocus();
-    }//GEN-LAST:event_radiobuttonOtherChangeExtActionPerformed
+    private void rbtnHdExtOtherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnHdExtOtherActionPerformed
+        txtfHdExtOther.requestFocus();
+    }//GEN-LAST:event_rbtnHdExtOtherActionPerformed
 
-    private void textfieldChangeextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textfieldChangeextActionPerformed
-        radioButtonOther.requestFocus();
-        radioButtonOther.setSelected(true);
-    }//GEN-LAST:event_textfieldChangeextActionPerformed
+    private void txtfHdExtOtherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtfHdExtOtherActionPerformed
+        rbtnFilterOther.requestFocus();
+        rbtnFilterOther.setSelected(true);
+    }//GEN-LAST:event_txtfHdExtOtherActionPerformed
 
-    private void buttonChangeFileExtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangeFileExtActionPerformed
+    private void btnHdExtChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHdExtChangeActionPerformed
         setChangeFileExtButton();
-    }//GEN-LAST:event_buttonChangeFileExtActionPerformed
+    }//GEN-LAST:event_btnHdExtChangeActionPerformed
 
-    private void radiobuttonRenameallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonRenameallActionPerformed
+    private void rbtnHdRenameallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnHdRenameallActionPerformed
         String msg = "If more than one file of same name exists,\nonly first file will be renamed.\nConfirm?";
         int input = JOptionPane.showConfirmDialog(null, msg, "", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         if(input == JOptionPane.CANCEL_OPTION) {
-            radiobuttonReplace.setSelected(true);
+            rbtnHdReplace.setSelected(true);
             return;
         }
-        textfieldRenamereplace.setEnabled(false);
-        checkboxRenameregex.setEnabled(false);
-    }//GEN-LAST:event_radiobuttonRenameallActionPerformed
+        txtfRenameReplace.setEnabled(false);
+        cbHdRenameRegex.setEnabled(false);
+    }//GEN-LAST:event_rbtnHdRenameallActionPerformed
 
-    private void radiobuttonReplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radiobuttonReplaceActionPerformed
-        textfieldRenamereplace.requestFocus();
-        textfieldRenamereplace.setEnabled(true);
-        checkboxRenameregex.setEnabled(true);
-    }//GEN-LAST:event_radiobuttonReplaceActionPerformed
+    private void rbtnHdReplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnHdReplaceActionPerformed
+        txtfRenameReplace.requestFocus();
+        txtfRenameReplace.setEnabled(true);
+        cbHdRenameRegex.setEnabled(true);
+    }//GEN-LAST:event_rbtnHdReplaceActionPerformed
 
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+    private void btnHdRenameRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHdRenameRenameActionPerformed
         setRenameButton();
-    }//GEN-LAST:event_jButton12ActionPerformed
+    }//GEN-LAST:event_btnHdRenameRenameActionPerformed
 
-    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+    private void btnHdSearchSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHdSearchSearchActionPerformed
         setSearchfilecontentButton();
-    }//GEN-LAST:event_jButton14ActionPerformed
+    }//GEN-LAST:event_btnHdSearchSearchActionPerformed
 
-    private void fileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fileChooserActionPerformed
-
-    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+    private void btnSearchOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchOpenActionPerformed
         HashSet<File> files = new HashSet();
-        for(int i = 0; i < tableFiles1.getRowCount(); i++) {
-            if((boolean)tableFiles1.getValueAt(i, 4))
-                files.add(new File((String)tableFiles.getValueAt(i, 0)));
+        for(int i = 0; i < tbSearchFiles.getRowCount(); i++) {
+            if((boolean)tbSearchFiles.getValueAt(i, 4))
+                files.add(new File((String)tbFileFiles.getValueAt(i, 0)));
         }
         Desktop desktop = Desktop.getDesktop();
         for(File f : files) {
@@ -1853,27 +1863,51 @@ public class MainFrame extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "UNSUPPORTED", null, JOptionPane.WARNING_MESSAGE);
+                joptionWarning("UNSUPPORTED");
             }
         }
-    }//GEN-LAST:event_jButton16ActionPerformed
+    }//GEN-LAST:event_btnSearchOpenActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        dialogAbout.setVisible(true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
+        if (Desktop.isDesktopSupported()) {
+            try {
+                URI uri = new URI("https://github.com/nicolaslee2000/File-Decoder.git");
+                Desktop.getDesktop().browse(uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            joptionWarning("UNSUPPORTED");
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // </editor-fold>
+    private void joptionWarning(String str) {
+        JOptionPane.showMessageDialog(null, str, null, JOptionPane.WARNING_MESSAGE);
+    }
     
     private void setSearchfilecontentButton(){
-        if(textareaSearchfilecontent.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Fill in text to search!", null, JOptionPane.WARNING_MESSAGE);
+        if(txtareaHdSearch.getText().isBlank()) {
+            joptionWarning("Fill in text to search!");
             return;
         }
-        labelFilescontaining.setText("Files containing: " + textareaSearchfilecontent.getText().strip());
-        DefaultTableModel model = (DefaultTableModel) tableFiles1.getModel();
+        lbSearchContaining.setText("Files containing: " + txtareaHdSearch.getText().strip());
+        DefaultTableModel model = (DefaultTableModel) tbSearchFiles.getModel();
         HashSet<File> files  = new HashSet();
         try {
             files.addAll(getSelectedFiles());
         } catch(NullPointerException e) {
             return;
         }
-        HashSet<File> resultfiles = fileHandler.searchFilecontent(files, textareaSearchfilecontent.getText().strip(), radiofilesearchregex.isSelected());
+        HashSet<File> resultfiles = fileHandler.searchFilecontent(files, txtareaHdSearch.getText().strip(), rbtnHdSearchRegex.isSelected());
         for(File f : resultfiles){
             DateFormat df = new SimpleDateFormat("dd/MM/yy  HH:mm:ss");
                 String name = f.getAbsolutePath();
@@ -1884,21 +1918,20 @@ public class MainFrame extends javax.swing.JFrame {
                 model.addRow(new Object[]{name, type, date, size, true});
         }
         
-        dialogSearchResult.setVisible(true);
+        dgSearch.setVisible(true);
     }
     
     private void setRenameButton() {
-        if(radiobuttonReplace.isSelected()&&textfieldRenamereplace.getText().isBlank()){
-            JOptionPane.showMessageDialog(null, "Fill in what you want to replace with!", null, JOptionPane.WARNING_MESSAGE);
+        if(rbtnHdReplace.isSelected()&&txtfRenameReplace.getText().isBlank()){
+            joptionWarning("Fill in what you want to replace with!");
             return;
         }
-        if(textfieldRenametarget.getText().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Fill in target name!", null, JOptionPane.WARNING_MESSAGE);
+        if(txtfHdRenameTarget.getText().isBlank()) {
+            joptionWarning("Fill in target name!");
             return;
         }
         try {
-            System.out.println("TEXTFIELDREPLACE"+textfieldRenamereplace.getText().strip());
-            fileHandler.rename(getSelectedFiles(), radiobuttonRenameall.isSelected() ? null : textfieldRenamereplace.getText().strip(), textfieldRenametarget.getText().strip(), checkboxRenameregex.isSelected());
+            fileHandler.rename(getSelectedFiles(), rbtnHdRenameall.isSelected() ? null : txtfRenameReplace.getText().strip(), txtfHdRenameTarget.getText().strip(), cbHdRenameRegex.isSelected());
         } catch(NullPointerException e) {
             return;
         }
@@ -1906,8 +1939,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void setChangeFileExtButton() {
-        if(textfieldChangeext.getText().strip().equals("")&&radiobuttonOtherChangeExt.isSelected() || textfieldTargetChangeExt.getText().strip().equals("")) {
-            JOptionPane.showMessageDialog(null, "Choose extension!", null, JOptionPane.WARNING_MESSAGE);
+        if(txtfHdExtOther.getText().strip().equals("")&&rbtnHdExtOther.isSelected() || txtfHdExtTarget.getText().strip().equals("")) {
+            joptionWarning("Choose extension!");
             return;
         }
         HashSet<File> files = new HashSet<>();
@@ -1918,29 +1951,29 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         for(File f : files){
-            if(!f.getName().contains("." + textfieldChangeext.getText().strip()))
+            if(!f.getName().contains("." + txtfHdExtOther.getText().strip()))
                 tempf.add(f);
         }
         files.removeAll(tempf);
         System.out.println("FILEs"+files);
-        System.out.println("ext"+textfieldTargetChangeExt.getText().strip());
-        fileHandler.changeExtension(files, textfieldTargetChangeExt.getText().strip());
+        System.out.println("ext"+txtfHdExtTarget.getText().strip());
+        fileHandler.changeExtension(files, txtfHdExtTarget.getText().strip());
          JOptionPane.showMessageDialog(null, "Complete!", "Complete!", JOptionPane.INFORMATION_MESSAGE);
     }
     
     private HashSet<File> getSelectedFiles() {
         HashSet<File> files = new HashSet<>();
-        for(int i = 0; i < tableFiles.getRowCount(); i++) {
-            if((boolean)tableFiles.getValueAt(i, 4)) 
-                files.add(new File((String)tableFiles.getValueAt(i, 0)));    
+        for(int i = 0; i < tbFileFiles.getRowCount(); i++) {
+            if((boolean)tbFileFiles.getValueAt(i, 4)) 
+                files.add(new File((String)tbFileFiles.getValueAt(i, 0)));    
         }
         if(files.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Select files!", null, JOptionPane.WARNING_MESSAGE);
+            joptionWarning("Select files!");
             throw new NullPointerException();
         }
         for(File f : files) {
             if(!f.exists()) {
-                JOptionPane.showMessageDialog(null, f.getAbsolutePath()+" does not exist!", null, JOptionPane.WARNING_MESSAGE);
+                joptionWarning(f.getAbsolutePath()+" does not exist!");
                 files.clear();
                 throw new NullPointerException();
             }
@@ -1949,34 +1982,50 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void setTableEncoding() {
-        DefaultTableModel model = (DefaultTableModel) tableEncoding.getModel();
-        for(String s : fileDetector.getAvailableCharsets().keySet()) {
+        DefaultTableModel model = (DefaultTableModel) tbSelectencoding.getModel();
+        for(String s : decoder.getAvailableCharsets().keySet()) {
             model.addRow(new Object[]{s, s == "UTF-8"});
         }
-        tableEncoding.getRowSorter().toggleSortOrder(1);
-        tableEncoding.getRowSorter().toggleSortOrder(1);
+        tbSelectencoding.getRowSorter().toggleSortOrder(1);
+        tbSelectencoding.getRowSorter().toggleSortOrder(1);
     }
     
     private void setDetectencodingButton() {
-        fileDetector.setSampleSize(Integer.valueOf(textfieldSamplesize.getText()));
-        if(fileDetector.getCharsetsToBeTested()==null) {
-            JOptionPane.showMessageDialog(null, "Select Encodings to Test!", null, JOptionPane.WARNING_MESSAGE);
+        boolean auto = rbtnDetectAuto.isSelected();
+        HashSet<Charset> csTobeTested;
+        File sample;
+        int size;
+        
+        if(txtareaDetectSelectedencodings.getText().isBlank()) {
+            joptionWarning("Select Encodings to Test!");
             return;
         }
-        if(!fileDetector.getSampleFile().exists()) {
-            JOptionPane.showMessageDialog(null, "Select sample file!", null, JOptionPane.WARNING_MESSAGE);
+        csTobeTested = new HashSet<>();
+        for(String s : txtareaDetectSelectedencodings.getText().split("\n")){
+            csTobeTested.add(Charset.forName(s));
+        }
+        
+        if(lbDetectSample.getText().isBlank()) {
+            joptionWarning("Select sample file!");
+            return;
+        }
+        sample = new File(lbDetectSample.getText());
+        if(!sample.exists()) {
+            joptionWarning("Sample File does not exists!");
             return;
         }
         
-        if(fileDetector.isBruteforce()) {
-            textareaBrute.setText(fileDetector.detectEncoding());
-            dialogBrute.setVisible(true);
+        size = Integer.parseInt(txtfDetectSamplesize.getText().strip());
+        
+        if(auto) {
+            HashSet<Charset> c = new HashSet<>();
+            c.add(decoder.detectEncodingAutomatic(sample, csTobeTested));
+            c.forEach(e -> lbAutoEncoding.setText(e.displayName()));
+            txtaAutoEncodings.setText(decoder.detectEncodingBruteforce(sample, c, size));
+            dgAuto.setVisible(true);
         } else {
-            labelDetectedencoding.setText(fileDetector.detectEncoding());
-            HashSet<Charset> c = new HashSet();
-            c.add(Charset.forName(fileDetector.detectEncoding()));
-            textareaDetectedencoding.setText(fileDetector.detectEncodingBruteforce(fileDetector.getSampleFile(), c, 100));
-            dialogAuto.setVisible(true);
+            txtaBruteEncodings.setText(decoder.detectEncodingBruteforce(sample, csTobeTested, size));
+            dgBrute.setVisible(true);
         }
     }
     
@@ -1992,43 +2041,67 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void enableDetectencoding(boolean enable) {
-        buttonSelectEncoding.setEnabled(enable);
-        textareaSelectedencodings.setEnabled(enable);
-        labelChoosesample.setEnabled(enable);
-        buttonChoosesample.setEnabled(enable);
-        labelSamplefile.setEnabled(enable);
-        labelSamplesize.setEnabled(enable);
-        textfieldSamplesize.setEnabled(enable);
-        buttonDetectencoding.setEnabled(enable);
+        btnDetectSelectencoding.setEnabled(enable);
+        txtareaDetectSelectedencodings.setEnabled(enable);
+        lbDetectChoosesample.setEnabled(enable);
+        btnDetectChoosefile.setEnabled(enable);
+        lbDetectSample.setEnabled(enable);
+        lbDetectSamplesize.setEnabled(enable);
+        txtfDetectSamplesize.setEnabled(enable);
+        btnDetectDetect.setEnabled(enable);
     }
     
     private void setDecodeButton() {
-
-        if(fileDecoder.getSourceCharset() == null) {
-            JOptionPane.showMessageDialog(null, "Select source Encoding!", null, JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+        HashSet<File> files = new HashSet<>();
+        Charset sourceCs;
+        Charset targetCs;
         try {
-            fileDecoder.setSourceFiles(getSelectedFiles());
+            files.addAll(getSelectedFiles());
         } catch(NullPointerException e) {
             return;
         }
-        fileDecoder.decode();
+        
+        if(cbDecodeSourceencoding.getSelectedItem() == "Select...") {
+            joptionWarning("Select source Encoding!");
+            return;
+        }
+        sourceCs = Charset.forName((String)cbDecodeSourceencoding.getSelectedItem());
+        targetCs = Charset.forName((String)cbDecodeTargetencoding.getSelectedItem());
+        
+        for(File f : files) {
+            if(rbtnDecodeOverwrite.isSelected()) {
+                decoder.decode(f, f, sourceCs, targetCs);
+                return;
+            } 
+            File target = new File(txtfDecodeTargetfolder.getText().strip());
+            if(!target.mkdirs()) {
+                joptionWarning("Invalid target folder!");
+                return;
+            }
+            File temp = new File(target, f.getName());
+            try {
+                temp.createNewFile();
+            } catch (IOException e) {
+                joptionWarning("FILE NOT CREATED");
+            }
+            decoder.decode(f, temp, sourceCs, targetCs);
+        }
+       
         JOptionPane.showMessageDialog(null, "Decoding complete!", "Complete!", JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void setComboboxEncoding(JComboBox box, String defaulttext) {
         if(defaulttext!=null) box.addItem(defaulttext);
-        fileDecoder.getAvailableCharsets().keySet().forEach(e -> box.addItem(e));
+        decoder.getAvailableCharsets().keySet().forEach(e -> box.addItem(e));
     }
     
     private void updateSelectAllButton() {
-        buttonSelectAll.setSelected(IsSelectedAll());
+        cbFileSelectall.setSelected(IsSelectedAll());
     }
     
     private boolean IsSelectedAll() {
-        for(int i = 0; i < tableFiles.getRowCount()-1; i++){
-            if((boolean)tableFiles.getValueAt(i, 4) == false) {
+        for(int i = 0; i < tbFileFiles.getRowCount()-1; i++){
+            if((boolean)tbFileFiles.getValueAt(i, 4) == false) {
                 return false;
             }
         }
@@ -2037,14 +2110,14 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void removeSelectedRows() {
         HashSet<File> files = new HashSet<>();
-        int rownum = tableFiles.getRowCount();
-        for(int i : tableFiles.getSelectedRows()){
-            files.add(new File((String)tableFiles.getValueAt(i, 0)));
+        int rownum = tbFileFiles.getRowCount();
+        for(int i : tbFileFiles.getSelectedRows()){
+            files.add(new File((String)tbFileFiles.getValueAt(i, 0)));
             rownum = i < rownum ? i : rownum;
         }
         removeFiles(files);
         if(rownum==0) return;
-        tableFiles.setRowSelectionInterval(rownum-1, rownum-1);
+        tbFileFiles.setRowSelectionInterval(rownum-1, rownum-1);
     }
     
     private HashSet<File> getFilesFromFilechooser(boolean multiSelect, int mode) {
@@ -2061,21 +2134,20 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void updateCards() {
         String currentCard = fileSelect.getFiles().isEmpty() ? "cardDragDrop" : "cardFile";
-        CardLayout c = (CardLayout) panelCard.getLayout();
-        c.show(panelCard, currentCard);
+        CardLayout c = (CardLayout) spcard.getLayout();
+        c.show(spcard, currentCard);
     }
     private void updateSamplefile() {
         //calculation to divide file name label so that it does not go out of border
-        if(tableFiles.getRowCount()>0) {
-            File sample = new File((String) tableFiles.getValueAt(0, 0));
+        if(tbFileFiles.getRowCount()>0) {
+            File sample = new File((String) tbFileFiles.getValueAt(0, 0));
             String str = "<html><p style=\"width:170px\">"+sample.getAbsolutePath()+"</p></html>";
-            fileDetector.setSampleFile(sample);
-            labelSamplefile.setText(str);
+            lbDetectSample.setText(str);
         }
     }
     
     private void updateTable() {
-        DefaultTableModel model = (DefaultTableModel) tableFiles.getModel();
+        DefaultTableModel model = (DefaultTableModel) tbFileFiles.getModel();
         Set<File> newfiles = new HashSet();
         Set<File> deletedfiles = new HashSet();
         for(int i = 0; i < model.getRowCount(); i++) {
@@ -2149,24 +2221,24 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void grayfilterPanelDragDrop(boolean b) {
         if(b){
-            panelDragDrop1.setBackground(new Color(230, 230, 230));
-            panelDragDrop2.setBackground(new Color(230, 230, 230));
-            panelDragDrop3.setBackground(new Color(230, 230, 230));
-            subPanelDragDrop.setBackground(new Color(230,230,230));
+            sspDragdrop1.setBackground(new Color(230, 230, 230));
+            ssspDragdrop2.setBackground(new Color(230, 230, 230));
+            sspDragdrop3.setBackground(new Color(230, 230, 230));
+            sspDragdrop.setBackground(new Color(230,230,230));
             
-            labelDropFile.setEnabled(false);
-            labelUploadIcon.setEnabled(false);
-            labelOr.setEnabled(false);
+            lbDragdropFiles.setEnabled(false);
+            lbDragdropUploadicon.setEnabled(false);
+            lbDragdropOr.setEnabled(false);
             buttonBrowseFile.setEnabled(false);
         } else {
-            panelDragDrop1.setBackground(new Color(242, 242, 242));
-            panelDragDrop2.setBackground(new Color(242, 242, 242));
-            panelDragDrop3.setBackground(new Color(242, 242, 242));
-            subPanelDragDrop.setBackground(new Color(242,242,242));
+            sspDragdrop1.setBackground(new Color(242, 242, 242));
+            ssspDragdrop2.setBackground(new Color(242, 242, 242));
+            sspDragdrop3.setBackground(new Color(242, 242, 242));
+            sspDragdrop.setBackground(new Color(242,242,242));
             
-            labelDropFile.setEnabled(true);
-            labelUploadIcon.setEnabled(true);
-            labelOr.setEnabled(true);
+            lbDragdropFiles.setEnabled(true);
+            lbDragdropUploadicon.setEnabled(true);
+            lbDragdropOr.setEnabled(true);
             buttonBrowseFile.setEnabled(true);
         }
     }
@@ -2183,13 +2255,6 @@ public class MainFrame extends javax.swing.JFrame {
         updateTable();
     }
     
-    private void initFileDecoder() {
-        fileDecoder = new FileDecoder();
-        fileDecoder.setOverwrite(false);
-        fileDecoder.setTargetCharset(Charset.forName("UTF-8"));
-        fileDecoder.setTargetFolder(new File(System.getProperty("user.home"), "\\Desktop\\decoded_files"));
-    }
-    
     private void initFileSelect() {
         fileSelect = new FileSelect();
         fileSelect.setFilterExt("");
@@ -2197,155 +2262,155 @@ public class MainFrame extends javax.swing.JFrame {
         fileSelect.setFilterName("");
         fileSelect.setFilterRegex(".*");
     }
-        
-    private void initFileEncodingDetector() {
-        fileDetector = new FileEncodingDetector();
-        fileDetector.setSampleSize(100);
-    }
     
     private void initFileHandler() {
         fileHandler = new FileHandler();
     }
     
+    private void initDecoder() {
+        decoder = new Decoder();
+    }
     /**
      * @param args the command line arguments
      */
 //<editor-fold defaultstate="collapsed" desc="Variable declaration">
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAutoHelp;
+    private javax.swing.JButton btnAutoOk;
+    private javax.swing.JButton btnBruteOk;
+    private javax.swing.JButton btnDecodeChoose;
+    private javax.swing.JButton btnDecodeDecode;
+    private javax.swing.JButton btnDetectChoosefile;
+    private javax.swing.JButton btnDetectDetect;
+    private javax.swing.JButton btnDetectHelp;
+    private javax.swing.JButton btnDetectSelectencoding;
+    private javax.swing.JButton btnFileOpen;
+    private javax.swing.JButton btnFileRemove;
+    private javax.swing.JButton btnFileRemoveall;
+    private javax.swing.JButton btnHdExtChange;
+    private javax.swing.JButton btnHdRenameRename;
+    private javax.swing.JButton btnHdSearchSearch;
+    private javax.swing.JButton btnSearchCancel;
+    private javax.swing.JButton btnSearchOpen;
+    private javax.swing.JButton btnSelectencodingCancel;
+    private javax.swing.JButton btnSelectencodingOk;
+    private javax.swing.ButtonGroup btngDecodeFolder;
+    private javax.swing.ButtonGroup btngDetect;
+    private javax.swing.ButtonGroup btngFilterExt;
+    private javax.swing.ButtonGroup btngHdExt;
+    private javax.swing.ButtonGroup btngHdRename;
+    private javax.swing.ButtonGroup btngHdSearch;
     private javax.swing.JButton buttonBrowseFile;
-    private javax.swing.JButton buttonChangeFileExt;
-    private javax.swing.JButton buttonChoosesample;
-    private javax.swing.JButton buttonChoosetarget;
-    private javax.swing.JButton buttonDecode;
-    private javax.swing.JButton buttonDetectencoding;
-    private javax.swing.JButton buttonOF;
-    private javax.swing.JButton buttonRemove;
-    private javax.swing.JButton buttonRemoveAll;
-    private javax.swing.JCheckBox buttonSelectAll;
-    private javax.swing.JButton buttonSelectEncoding;
-    private javax.swing.ButtonGroup buttongroupDetectencoding;
-    private javax.swing.ButtonGroup buttongroupExt;
-    private javax.swing.ButtonGroup buttongroupFileext;
-    private javax.swing.ButtonGroup buttongroupRemanefiles;
-    private javax.swing.ButtonGroup buttongroupSearchfilecontent;
-    private javax.swing.ButtonGroup buttongroupTargetfolder;
-    private javax.swing.JCheckBox checkBoxHiddenFiles;
-    private javax.swing.JCheckBox checkboxFileName;
-    private javax.swing.JCheckBox checkboxRegex;
-    private javax.swing.JCheckBox checkboxRenameregex;
-    private javax.swing.JComboBox<String> comboboxSourceEncoding;
-    private javax.swing.JComboBox<String> comboboxTargetEncoding;
-    private javax.swing.JDialog dialogAuto;
-    private javax.swing.JDialog dialogBrute;
-    private javax.swing.JDialog dialogSearchResult;
-    private javax.swing.JDialog dialogSelectEncoding;
+    private javax.swing.JComboBox<String> cbDecodeSourceencoding;
+    private javax.swing.JComboBox<String> cbDecodeTargetencoding;
+    private javax.swing.JCheckBox cbFileSelectall;
+    private javax.swing.JCheckBox cbFilterFilename;
+    private javax.swing.JCheckBox cbFilterHidden;
+    private javax.swing.JCheckBox cbFilterRegex;
+    private javax.swing.JCheckBox cbHdRenameRegex;
+    private javax.swing.JDialog dgAuto;
+    private javax.swing.JDialog dgBrute;
+    private javax.swing.JDialog dgSearch;
+    private javax.swing.JDialog dgSelectencoding;
+    private javax.swing.JDialog dialogAbout;
     private javax.swing.JFileChooser fileChooser;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton15;
-    private javax.swing.JButton jButton16;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JRadioButton jRadioButton11;
-    private javax.swing.JRadioButton jRadioButton7;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JLabel labelChoosesample;
-    private javax.swing.JLabel labelDetectedencoding;
-    private javax.swing.JLabel labelDropFile;
-    private javax.swing.JLabel labelFilescontaining;
-    private javax.swing.JLabel labelOr;
-    private javax.swing.JLabel labelSamplefile;
-    private javax.swing.JLabel labelSamplesize;
-    private javax.swing.JLabel labelUploadIcon;
-    private javax.swing.JLabel lableExt;
+    private javax.swing.JLabel lbAutoEncoding;
+    private javax.swing.JLabel lbAutoSample;
+    private javax.swing.JLabel lbAutoSuggested;
+    private javax.swing.JLabel lbDecodeArrow;
+    private javax.swing.JLabel lbDecodeSourceencoding;
+    private javax.swing.JLabel lbDecodeTargetencoding;
+    private javax.swing.JLabel lbDetectChoosesample;
+    private javax.swing.JLabel lbDetectSample;
+    private javax.swing.JLabel lbDetectSamplesize;
+    private javax.swing.JLabel lbDragdropFiles;
+    private javax.swing.JLabel lbDragdropOr;
+    private javax.swing.JLabel lbDragdropUploadicon;
+    private javax.swing.JLabel lbFilterExt;
+    private javax.swing.JLabel lbHdExtArrow;
+    private javax.swing.JLabel lbHdExtTarget;
+    private javax.swing.JLabel lbHdRename;
+    private javax.swing.JLabel lbHdRenameArrow;
+    private javax.swing.JLabel lbHdRenameTarget;
+    private javax.swing.JLabel lbHdSearch;
+    private javax.swing.JLabel lbHdSearchSearchby;
+    private javax.swing.JLabel lbSearchContaining;
+    private javax.swing.JLabel lbhdExtExt;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuEdit;
     private javax.swing.JMenu menuFile;
-    private javax.swing.JPanel panelCard;
-    private javax.swing.JPanel panelDragDrop1;
-    private javax.swing.JPanel panelDragDrop2;
-    private javax.swing.JPanel panelDragDrop3;
-    private javax.swing.JPanel panelFileFilters;
-    private javax.swing.JPanel panelFiles;
+    private javax.swing.JPanel pAuto;
+    private javax.swing.JPanel pBrute;
+    private javax.swing.JPanel pFiles;
+    private javax.swing.JPanel pSearch;
+    private javax.swing.JPanel pSelectencoding;
     private javax.swing.JPanel panelFunctions;
-    private javax.swing.JRadioButton radioAuto;
-    private javax.swing.JRadioButton radioBrute;
-    private javax.swing.JRadioButton radioButtonOther;
-    private javax.swing.JRadioButton radiobuttonAll;
-    private javax.swing.JRadioButton radiobuttonOtherChangeExt;
-    private javax.swing.JRadioButton radiobuttonOverwriteall;
-    private javax.swing.JRadioButton radiobuttonRenameall;
-    private javax.swing.JRadioButton radiobuttonReplace;
-    private javax.swing.JRadioButton radiobuttonTargetfolder;
-    private javax.swing.JRadioButton radiofilesearchregex;
-    private javax.swing.JPanel subPanelDecode;
-    private javax.swing.JPanel subPanelDetectEncoding;
-    private javax.swing.JPanel subPanelDragDrop;
-    private javax.swing.JPanel subPanelFileHandling;
-    private javax.swing.JScrollPane subPanelFilesScroll;
+    private javax.swing.JRadioButton rbtnDecodeOverwrite;
+    private javax.swing.JRadioButton rbtnDetectAuto;
+    private javax.swing.JRadioButton rbtnDetectBrute;
+    private javax.swing.JRadioButton rbtnFilterAll;
+    private javax.swing.JRadioButton rbtnFilterOther;
+    private javax.swing.JRadioButton rbtnHdExtAll;
+    private javax.swing.JRadioButton rbtnHdExtOther;
+    private javax.swing.JRadioButton rbtnHdRenameall;
+    private javax.swing.JRadioButton rbtnHdReplace;
+    private javax.swing.JRadioButton rbtnHdSearchRegex;
+    private javax.swing.JRadioButton rbtnHdSearchText;
+    private javax.swing.JRadioButton rbtnTargetfolder;
+    private javax.swing.JSeparator separatorDecode;
+    private javax.swing.JSeparator separatorDetect;
+    private javax.swing.JSeparator separatorFilter;
+    private javax.swing.JSeparator separatorHdExt;
+    private javax.swing.JSeparator separatorHdRename;
+    private javax.swing.JPanel spDecode;
+    private javax.swing.JPanel spDetect;
+    private javax.swing.JPanel spFilter;
+    private javax.swing.JPanel spHd;
+    private javax.swing.JPanel spTools;
+    private javax.swing.JPanel spcard;
+    private javax.swing.JPanel sspDecode1;
+    private javax.swing.JPanel sspDecode2;
+    private javax.swing.JPanel sspDetect;
+    private javax.swing.JPanel sspDragdrop;
+    private javax.swing.JPanel sspDragdrop1;
+    private javax.swing.JPanel sspDragdrop3;
+    private javax.swing.JScrollPane sspFilesscroll;
+    private javax.swing.JPanel sspHdExt;
+    private javax.swing.JPanel sspHdSearch;
+    private javax.swing.JPanel sspHdrename;
+    private javax.swing.JPanel ssspDragdrop2;
     private javax.swing.JScrollPane subPanelFilesScroll1;
-    private javax.swing.JPanel subPanelTool;
     private javax.swing.JTabbedPane tabbedPane;
-    private javax.swing.JTable tableEncoding;
-    private javax.swing.JTable tableFiles;
-    private javax.swing.JTable tableFiles1;
-    private javax.swing.JTextField textFieldExt;
-    private javax.swing.JTextField textFieldFileName;
-    private javax.swing.JTextArea textareaBrute;
-    private javax.swing.JTextArea textareaDetectedencoding;
-    private javax.swing.JTextArea textareaSearchfilecontent;
-    private javax.swing.JTextArea textareaSelectedencodings;
-    private javax.swing.JTextField textfieldChangeext;
-    private javax.swing.JTextField textfieldRegex;
-    private javax.swing.JTextField textfieldRenamereplace;
-    private javax.swing.JTextField textfieldRenametarget;
-    private javax.swing.JFormattedTextField textfieldSamplesize;
-    private javax.swing.JTextField textfieldTargetChangeExt;
-    private javax.swing.JTextField textfieldTargetfolder;
+    private javax.swing.JTable tbFileFiles;
+    private javax.swing.JTable tbSearchFiles;
+    private javax.swing.JTable tbSelectencoding;
+    private javax.swing.JTextArea txtaAutoEncodings;
+    private javax.swing.JTextArea txtaBruteEncodings;
+    private javax.swing.JTextArea txtareaDetectSelectedencodings;
+    private javax.swing.JTextArea txtareaHdSearch;
+    private javax.swing.JTextField txtfDecodeTargetfolder;
+    private javax.swing.JFormattedTextField txtfDetectSamplesize;
+    private javax.swing.JTextField txtfFilterExt;
+    private javax.swing.JTextField txtfFilterFilename;
+    private javax.swing.JTextField txtfFilterRegex;
+    private javax.swing.JTextField txtfHdExtOther;
+    private javax.swing.JTextField txtfHdExtTarget;
+    private javax.swing.JTextField txtfHdRenameTarget;
+    private javax.swing.JTextField txtfRenameReplace;
     // End of variables declaration//GEN-END:variables
     
 // </editor-fold>
     FileSelect fileSelect;
-    FileDecoder fileDecoder;
-    FileEncodingDetector fileDetector;
+    Decoder decoder;
     FileHandler fileHandler;
 }
 

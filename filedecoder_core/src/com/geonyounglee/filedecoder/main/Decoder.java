@@ -36,7 +36,7 @@ public class Decoder {
 	public void setAvailableCharsets(Map<String, Charset> availableCharsets) {
 		this.availableCharsets = availableCharsets;
 	}
-	Decoder() {
+	public Decoder() {
 		setAvailableCharsets(Charset.availableCharsets());
 	}
 	

@@ -1,4 +1,8 @@
 package main;
+/**
+ * IMPORTANT THIS CLASS IS OBSOLETE!!!
+ */
+
 
 import java.io.File;
 import java.io.IOException;
