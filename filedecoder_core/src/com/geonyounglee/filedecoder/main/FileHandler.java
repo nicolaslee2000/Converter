@@ -5,17 +5,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Set;
 
 public class FileHandler {
 	
-    public void changeExtension(HashSet<File> files, String ext) {
+    public void changeExtension(Set<File> files, String ext) {
             for(File f:files) {
                     int index = f.getAbsolutePath().lastIndexOf(".");
                     f.renameTo(new File(f.getAbsolutePath().substring(0, index + 1) + ext));
             }
     }
 
-    public void rename(HashSet<File> files, String original, String replace, boolean regex) {
+    public void rename(Set<File> files, String original, String replace, boolean regex) {
 
         for(File f : files) {
             System.out.println("ORIGINAL"+original);
@@ -32,8 +33,8 @@ public class FileHandler {
         }
     }
 
-    public HashSet<File> searchFilecontent(HashSet<File> files, String text, boolean regex) {
-            HashSet<File> resultfiles = new HashSet<>();
+    public Set<File> searchFilecontent(Set<File> files, String text, boolean regex) {
+            Set<File> resultfiles = new HashSet<>();
             for(File f : files) {
                     Path fileName = Path.of(f.getAbsolutePath());
                     try {

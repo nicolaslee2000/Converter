@@ -16,7 +16,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,7 +67,7 @@ public class Decoder {
 		}
 	}
 	
-	public Charset detectEncodingAutomatic(File file, HashSet<Charset> c) {
+	public Charset detectEncodingAutomatic(File file, Set<Charset> c) {
 		CharsetDecoder decoder;
 		byte[] byteArray;
 		Charset charset = null;
@@ -95,7 +94,7 @@ public class Decoder {
 	}
 	
 	//TODO Files.readallbytes test later
-	public String detectEncodingBruteforce(File file, HashSet<Charset> cs, int sampleSize) {
+	public String detectEncodingBruteforce(File file, Set<Charset> cs, int sampleSize) {
 		byte[] byteArray = new byte[512];
 		String msg = "";
 		try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));){

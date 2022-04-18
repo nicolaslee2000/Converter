@@ -4,34 +4,35 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class FileSelect {
-    private HashSet<File> files;
-    private HashMap<String, HashSet<File>> tempfiles;
+    private Set<File> files;
+    private HashMap<String, Set<File>> tempfiles;
     
     public FileSelect() {
             files = new HashSet<>();
             tempfiles = new HashMap<>();
     }
 
-    public HashSet<File> getFiles() {
+    public Set<File> getFiles() {
         return files;
     }
 
-    public HashMap<String, HashSet<File>> getTempfiles() {
+    public HashMap<String, Set<File>> getTempfiles() {
         return tempfiles;
     }
     
-    public void addFiles(HashSet<File> files) {
+    public void addFiles(Set<File> files) {
             files.forEach(e -> this.files.addAll(getAllFiles(e)));
     }
     public void addFiles(File files) {
             this.files.addAll(getAllFiles(files));
     }
-    public void removeFiles(HashSet<File> files) {
+    public void removeFiles(Set<File> files) {
         this.files.removeAll(files);
         if(this.files.isEmpty()) 
         	tempfiles.clear();
@@ -42,8 +43,8 @@ public class FileSelect {
         	tempfiles.clear();
 	}
 	
-    private HashSet<File> getAllFiles(File file) {
-        HashSet<File> files = new HashSet<>();
+    private Set<File> getAllFiles(File file) {
+        Set<File> files = new HashSet<>();
         if(file.isDirectory()) {
             for(File subFiles : file.listFiles()) {
                 if(subFiles.isDirectory()) {
@@ -83,8 +84,8 @@ public class FileSelect {
     }
     
     private void setFilter(FileFilter i, String filterName) {
-        HashSet<File> temp1 = new HashSet<>();
-        HashSet<File> temp2 = new HashSet<>();
+        Set<File> temp1 = new HashSet<>();
+        Set<File> temp2 = new HashSet<>();
         for(File f : files) {
             if(i.accept(f)) {
                 temp1.add(f);

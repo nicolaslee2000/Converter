@@ -21,8 +21,8 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -38,8 +38,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 import main.Decoder;
 
-import main.FileDecoder;
-import main.FileEncodingDetector;
+
 import main.FileHandler;
 import main.FileSelect;
 
@@ -163,7 +162,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnDetectDetect = new javax.swing.JButton();
         lbDetectSamplesize = new javax.swing.JLabel();
         lbDetectChoosesample = new javax.swing.JLabel();
-        txtfDetectSamplesize = new JFormattedTextField(setNumberformatter(txtfDetectSamplesize));
+        txtfDetectSamplesize = new JFormattedTextField(getNumberformatter());
         jScrollPane6 = new javax.swing.JScrollPane();
         txtareaDetectSelectedencodings = new javax.swing.JTextArea();
         spHd = new javax.swing.JPanel();
@@ -1785,7 +1784,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDetectChoosefileActionPerformed
 
     private void btnSelectencodingOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectencodingOkActionPerformed
-        HashSet<Charset> cs = new HashSet<>();
+        Set<Charset> cs = new HashSet<>();
         for(int i =0; i < tbSelectencoding.getRowCount(); i++) {
             if((boolean)tbSelectencoding.getValueAt(i, 1)) cs.add(Charset.forName((String)tbSelectencoding.getValueAt(i, 0)));
         }
@@ -1849,7 +1848,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnHdSearchSearchActionPerformed
 
     private void btnSearchOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchOpenActionPerformed
-        HashSet<File> files = new HashSet();
+        Set<File> files = new HashSet<>();
         for(int i = 0; i < tbSearchFiles.getRowCount(); i++) {
             if((boolean)tbSearchFiles.getValueAt(i, 4))
                 files.add(new File((String)tbFileFiles.getValueAt(i, 0)));
@@ -1901,17 +1900,17 @@ public class MainFrame extends javax.swing.JFrame {
         }
         lbSearchContaining.setText("Files containing: " + txtareaHdSearch.getText().strip());
         DefaultTableModel model = (DefaultTableModel) tbSearchFiles.getModel();
-        HashSet<File> files  = new HashSet();
+        Set<File> files  = new HashSet<>();
         try {
             files.addAll(getSelectedFiles());
         } catch(NullPointerException e) {
             return;
         }
-        HashSet<File> resultfiles = fileHandler.searchFilecontent(files, txtareaHdSearch.getText().strip(), rbtnHdSearchRegex.isSelected());
+        Set<File> resultfiles = fileHandler.searchFilecontent(files, txtareaHdSearch.getText().strip(), rbtnHdSearchRegex.isSelected());
         for(File f : resultfiles){
             DateFormat df = new SimpleDateFormat("dd/MM/yy  HH:mm:ss");
                 String name = f.getAbsolutePath();
-                String type = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf("."));
+                String type = f.getName().contains(".") ?  f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf(".")) : "ddd";
                 //shouldve chosen nio
                 String date = df.format(f.lastModified());
                 String size = f.length() < 1000 && f.length() != 0 ? 1 + "KB"  :  String.valueOf(f.length()/1000l) + "KB";
@@ -1943,8 +1942,8 @@ public class MainFrame extends javax.swing.JFrame {
             joptionWarning("Choose extension!");
             return;
         }
-        HashSet<File> files = new HashSet<>();
-        HashSet<File> tempf = new HashSet();
+        Set<File> files = new HashSet<>();
+        Set<File> tempf = new HashSet<>();
         try {
             files.addAll(getSelectedFiles());
         } catch(NullPointerException e) {
@@ -1961,8 +1960,8 @@ public class MainFrame extends javax.swing.JFrame {
          JOptionPane.showMessageDialog(null, "Complete!", "Complete!", JOptionPane.INFORMATION_MESSAGE);
     }
     
-    private HashSet<File> getSelectedFiles() {
-        HashSet<File> files = new HashSet<>();
+    private Set<File> getSelectedFiles() {
+        Set<File> files = new HashSet<>();
         for(int i = 0; i < tbFileFiles.getRowCount(); i++) {
             if((boolean)tbFileFiles.getValueAt(i, 4)) 
                 files.add(new File((String)tbFileFiles.getValueAt(i, 0)));    
@@ -1984,7 +1983,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void setTableEncoding() {
         DefaultTableModel model = (DefaultTableModel) tbSelectencoding.getModel();
         for(String s : decoder.getAvailableCharsets().keySet()) {
-            model.addRow(new Object[]{s, s == "UTF-8"});
+            model.addRow(new Object[]{s, "UTF-8".equals(s)});
         }
         tbSelectencoding.getRowSorter().toggleSortOrder(1);
         tbSelectencoding.getRowSorter().toggleSortOrder(1);
@@ -1992,7 +1991,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void setDetectencodingButton() {
         boolean auto = rbtnDetectAuto.isSelected();
-        HashSet<Charset> csTobeTested;
+        Set<Charset> csTobeTested;
         File sample;
         int size;
         
@@ -2018,7 +2017,7 @@ public class MainFrame extends javax.swing.JFrame {
         size = Integer.parseInt(txtfDetectSamplesize.getText().strip());
         
         if(auto) {
-            HashSet<Charset> c = new HashSet<>();
+            Set<Charset> c = new HashSet<>();
             c.add(decoder.detectEncodingAutomatic(sample, csTobeTested));
             c.forEach(e -> lbAutoEncoding.setText(e.displayName()));
             txtaAutoEncodings.setText(decoder.detectEncodingBruteforce(sample, c, size));
@@ -2029,7 +2028,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
-    private NumberFormatter setNumberformatter(JFormattedTextField textfield) {
+    private NumberFormatter getNumberformatter() {
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
@@ -2052,7 +2051,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void setDecodeButton() {
-        HashSet<File> files = new HashSet<>();
+        Set<File> files = new HashSet<>();
         Charset sourceCs;
         Charset targetCs;
         try {
@@ -2109,7 +2108,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void removeSelectedRows() {
-        HashSet<File> files = new HashSet<>();
+        Set<File> files = new HashSet<>();
         int rownum = tbFileFiles.getRowCount();
         for(int i : tbFileFiles.getSelectedRows()){
             files.add(new File((String)tbFileFiles.getValueAt(i, 0)));
@@ -2120,10 +2119,10 @@ public class MainFrame extends javax.swing.JFrame {
         tbFileFiles.setRowSelectionInterval(rownum-1, rownum-1);
     }
     
-    private HashSet<File> getFilesFromFilechooser(boolean multiSelect, int mode) {
+    private Set<File> getFilesFromFilechooser(boolean multiSelect, int mode) {
         fileChooser.setMultiSelectionEnabled(multiSelect);
         fileChooser.setFileSelectionMode(mode);
-        HashSet<File> set = new HashSet();
+        Set<File> set = new HashSet<>();
         if(fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
             set.addAll(Set.of(fileChooser.getSelectedFiles()));
             if(!multiSelect) set.add(fileChooser.getSelectedFile());
@@ -2137,6 +2136,7 @@ public class MainFrame extends javax.swing.JFrame {
         CardLayout c = (CardLayout) spcard.getLayout();
         c.show(spcard, currentCard);
     }
+    
     private void updateSamplefile() {
         //calculation to divide file name label so that it does not go out of border
         if(tbFileFiles.getRowCount()>0) {
@@ -2148,8 +2148,8 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void updateTable() {
         DefaultTableModel model = (DefaultTableModel) tbFileFiles.getModel();
-        Set<File> newfiles = new HashSet();
-        Set<File> deletedfiles = new HashSet();
+        Set<File> newfiles = new HashSet<>();
+        Set<File> deletedfiles = new HashSet<>();
         for(int i = 0; i < model.getRowCount(); i++) {
             deletedfiles.add(new File((String)model.getValueAt(i, 0)));
         }
@@ -2160,7 +2160,7 @@ public class MainFrame extends javax.swing.JFrame {
         for(File f : newfiles){
             DateFormat df = new SimpleDateFormat("dd/MM/yy  HH:mm:ss");
                 String name = f.getAbsolutePath();
-                String type = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf("."));
+                String type = f.getName().contains(".") ?  f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf(".")) : "";
                 //shouldve chosen nio
                 String date = df.format(f.lastModified());
                 String size = f.length() < 1000 && f.length() != 0 ? 1 + "KB"  :  String.valueOf(f.length()/1000l) + "KB";
@@ -2203,7 +2203,7 @@ public class MainFrame extends javax.swing.JFrame {
                 dtde.acceptDrop(DnDConstants.ACTION_COPY);
                 Transferable transferable = dtde.getTransferable();
                 DataFlavor[] flavors = transferable.getTransferDataFlavors();
-                HashSet<File> files = new HashSet<>();
+                Set<File> files = new HashSet<>();
                 for (DataFlavor f : flavors){
                     if(f.isFlavorJavaFileListType()){
                         try {
@@ -2243,14 +2243,18 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
     
-        private void removeFiles(HashSet<File> files) {
-        Set<File> f = new HashSet<>();
-        f.addAll(files);
-        fileSelect.removeFiles(files);
+    private void removeFiles(Set<File> files) {
+    	Iterator<File> it = files.iterator();
+    	while(it.hasNext()) {
+    		fileSelect.removeFiles(it.next());
+    	}
+//        Set<File> f = new HashSet<>();
+//        f.addAll(files);
+//        fileSelect.removeFiles(f);
         updateTable();
     }
     
-    private void addFiles(HashSet<File> files) {
+    private void addFiles(Set<File> files) {
         fileSelect.addFiles(files);
         updateTable();
     }
